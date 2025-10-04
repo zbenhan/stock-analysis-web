@@ -124,20 +124,33 @@ def process_data(price_df, financial_df):
 def generate_chart(monthly_last_data, financial_df, stock_info):
     """生成图表"""
     try:
-        # 设置中文字体 - 更完整的字体列表
+        # 设置中文字体 - 使用系统默认字体，避免依赖外部字体
         plt.rcParams['font.sans-serif'] = [
-            'SimHei',        # 黑体
-            'Microsoft YaHei', # 微软雅黑
-            'Arial Unicode MS', # Arial Unicode
-            'DejaVu Sans',   # 跨平台字体
-            'WenQuanYi Micro Hei', # 文泉驿微米黑
-            'Arial'
+            'DejaVu Sans',   # 跨平台开源字体，通常已安装
+            'Arial Unicode MS', # 跨平台字体
+            'Arial',         # 通用字体
+            'Liberation Sans', # 常见Linux字体
+            'Bitstream Vera Sans' # 常见Linux字体
         ]
         plt.rcParams['axes.unicode_minus'] = False
         
-        # 创建图表 - 缩小尺寸
-        fig, ax1 = plt.subplots(figsize=(10, 5))  # 从 (12, 6) 缩小到 (10, 5)
+        # 如果上述字体都不行，尝试下载并使用字体
+        try:
+            import matplotlib.font_manager as fm
+            # 检查是否有可用的中文字体
+            chinese_fonts = [f.name for f in fm.fontManager.ttflist if 'Chinese' in f.name or 'CJK' in f.name]
+            if not chinese_fonts:
+                # 如果没有中文字体，使用默认字体
+                print("警告：未找到中文字体，使用默认字体")
+            else:
+                print(f"找到中文字体: {chinese_fonts[:3]}")  # 显示前3个
+        except Exception as e:
+            print(f"字体检查失败: {e}")
         
+        # 创建图表 - 缩小尺寸
+        fig, ax1 = plt.subplots(figsize=(10, 5))
+        
+        # 其余代码保持不变...
         # 合并数据
         merged_df = pd.merge(monthly_last_data, financial_df, on='data_date', how='outer')
         merged_df['data_date'] = pd.to_datetime(merged_df['data_date'])
@@ -160,14 +173,14 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         
         # 市值图表
         color = 'darkblue'
-        ax1.set_xlabel('日期', fontsize=10)
-        ax1.set_ylabel('市值', color=color, fontsize=10)
+        ax1.set_xlabel('Date')  # 使用英文避免中文问题
+        ax1.set_ylabel('Market Cap', color=color, fontsize=10)
         
         if market_data.empty:
             return None
             
         line1 = ax1.plot(market_dates_display, market_data['market_capitalization'],
-                        color=color, marker='o', linewidth=2, label='市值', markersize=4)
+                        color=color, marker='o', linewidth=2, label='Market Cap', markersize=4)
         ax1.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax1.tick_params(axis='x', labelsize=8)
         ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
@@ -179,15 +192,15 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         if profit_data.empty:
             return None
             
-        ax2.set_ylabel('净利润', color=color, fontsize=10)
+        ax2.set_ylabel('Net Profit', color=color, fontsize=10)
         line2 = ax2.plot(profit_dates_display, profit_data['net_profit_parent_quarterly'],
                         color=color, marker='s', linewidth=2, linestyle='--', 
-                        label='净利润', markersize=4)
+                        label='Net Profit', markersize=4)
         ax2.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
-        # 设置标题和格式 - 缩小字体
-        plt.title(f'{stock_info.security_name}({stock_info.security_code})市值与净利润趋势分析',
+        # 设置标题和格式 - 使用英文
+        plt.title(f'{stock_info.security_code} Market Cap vs Net Profit Trend',
                  fontsize=12, pad=15)
         
         # 图例和网格
@@ -201,7 +214,7 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         
         # 转换为base64 - 降低DPI以减小文件大小
         buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=80, bbox_inches='tight')  # 从100降到80
+        plt.savefig(buffer, format='png', dpi=80, bbox_inches='tight')
         buffer.seek(0)
         image_base64 = base64.b64encode(buffer.getvalue()).decode()
         plt.close()
