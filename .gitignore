@@ -1,0 +1,17 @@
+﻿# IDE
+.vs/
+*.pyproj.user
+*.sln
+*.pyproj
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+
+# 备份文件
+*-副本.*
+backup/
