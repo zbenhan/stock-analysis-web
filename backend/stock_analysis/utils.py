@@ -122,43 +122,21 @@ def process_data(price_df, financial_df):
         return None, None, f"数据处理失败: {str(e)}"
 
 def generate_chart(monthly_last_data, financial_df, stock_info):
-    """生成图表"""
+    """生成图表 - 简化版本，避免字体问题"""
     try:
         print("开始生成图表...")
         
-        # 明确设置matplotlib配置，避免使用系统字体
+        # 完全重置matplotlib配置
         import matplotlib
         matplotlib.rcParams.update(matplotlib.rcParamsDefault)
         
-        # 设置中文字体 - 尝试多种方案
-        plt.rcParams['font.sans-serif'] = [
-            'DejaVu Sans',        # Linux 系统常见字体
-            'Arial',              # 跨平台字体
-            'Liberation Sans',    # 开源字体
-            'Bitstream Vera Sans' # 开源字体
-        ]
+        # 使用最基本的字体设置
+        plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial']
         plt.rcParams['axes.unicode_minus'] = False
         
-        # 强制重新生成字体缓存
-        try:
-            import matplotlib.font_manager as fm
-            fm._rebuild()
-            
-            # 打印可用字体用于调试
-            available_fonts = [f.name for f in fm.fontManager.ttflist]
-            print(f"可用字体数量: {len(available_fonts)}")
-            
-            # 检查是否有支持中文的字体
-            chinese_support_fonts = [f for f in available_fonts if any(char in f for char in ['CJK', 'Chinese', 'Unicode'])]
-            print(f"可能支持中文的字体: {chinese_support_fonts}")
-        except Exception as font_error:
-            print(f"字体设置错误: {font_error}")
-        
-        print("创建图表对象...")
         # 创建图表
         fig, ax1 = plt.subplots(figsize=(12, 6))
         
-        print("处理数据...")
         # 合并数据
         merged_df = pd.merge(monthly_last_data, financial_df, on='data_date', how='outer')
         merged_df['data_date'] = pd.to_datetime(merged_df['data_date'])
@@ -172,7 +150,6 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
             print("数据为空，无法生成图表")
             return None
         
-        print("准备绘图数据...")
         # 将日期减1年用于显示
         market_data = merged_df.dropna(subset=['market_capitalization']).sort_values('data_date')
         profit_data = merged_df.dropna(subset=['net_profit_parent_quarterly']).sort_values('data_date')
@@ -181,44 +158,39 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         market_dates_display = market_data['data_date'] - pd.DateOffset(years=1)
         profit_dates_display = profit_data['data_date'] - pd.DateOffset(years=1)
         
-        print("绘制市值图表...")
-        # 市值图表 - 使用中文
+        # 市值图表 - 暂时使用英文
         color = 'darkblue'
-        ax1.set_xlabel('日期', fontsize=12)
-        ax1.set_ylabel('市值', color=color, fontsize=12)
+        ax1.set_xlabel('Date', fontsize=12)  # 暂时用英文
+        ax1.set_ylabel('Market Cap', color=color, fontsize=12)
         
         if market_data.empty:
-            print("市值数据为空")
             return None
             
         line1 = ax1.plot(market_dates_display, market_data['market_capitalization'],
-                        color=color, marker='o', linewidth=2, label='市值', markersize=4)
+                        color=color, marker='o', linewidth=2, label='Market Cap', markersize=4)
         ax1.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax1.tick_params(axis='x', labelsize=8)
         ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
-        print("绘制净利润图表...")
-        # 净利润图表 - 使用中文
+        # 净利润图表 - 暂时使用英文
         ax2 = ax1.twinx()
         color = 'orange'
         
         if profit_data.empty:
-            print("净利润数据为空")
             return None
             
-        ax2.set_ylabel('净利润', color=color, fontsize=12)
+        ax2.set_ylabel('Net Profit', color=color, fontsize=12)
         line2 = ax2.plot(profit_dates_display, profit_data['net_profit_parent_quarterly'],
                         color=color, marker='s', linewidth=2, linestyle='--', 
-                        label='净利润', markersize=4)
+                        label='Net Profit', markersize=4)
         ax2.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
-        print("设置标题...")
-        # 设置标题和格式 - 使用中文
-        plt.title(f'{stock_info.security_name}({stock_info.security_code})市值与净利润趋势分析',
+        # 设置标题和格式 - 暂时使用英文
+        plt.title(f'{stock_info.security_code} Market Cap vs Net Profit Trend',
                  fontsize=14, pad=20)
         
-        # 图例和网格 - 使用中文
+        # 图例和网格
         lines1, labels1 = ax1.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
         ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=10)
@@ -227,7 +199,6 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         # 调整布局
         fig.tight_layout()
         
-        print("保存图表为base64...")
         # 转换为base64
         buffer = io.BytesIO()
         plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
