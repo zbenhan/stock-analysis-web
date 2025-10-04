@@ -1,15 +1,5 @@
 import os
 from pathlib import Path
-import matplotlib
-matplotlib.use("Agg")  # 必须在导入pyplot之前
-matplotlib.rcParams['font.sans-serif'] = [
-    'SimHei', 
-    'Microsoft YaHei',
-    'Arial Unicode MS',
-    'DejaVu Sans',
-    'WenQuanYi Micro Hei'
-]
-matplotlib.rcParams['axes.unicode_minus'] = False
 
 # 构建项目根目录路径
 BASE_DIR = Path(__file__).resolve().parent.parent
