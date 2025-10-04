@@ -12,14 +12,25 @@ import matplotlib.pyplot as plt
 def get_random_stock_codes(count=10):
     """从数据库随机获取股票代码"""
     try:
-        # 使用相对路径构建数据库路径
-        #db_path = os.path.join(settings.BASE_DIR, 'data', 'stock_data.db')
-
-        # 获取 PROJECT_ROOT 的父目录
-        base_dir = os.path.dirname(settings.PROJECT_ROOT)
-        # 拼接目标路径
-        db_path = os.path.join(base_dir, 'stock_analysis_web','data', 'stock_data.db')
-
+        # 方法1：直接使用 BASE_DIR
+        db_path = os.path.join(settings.BASE_DIR, 'data', 'stock_data.db')
+        
+        # 如果方法1不行，尝试方法2：使用 PROJECT_ROOT（如果存在）
+        if not os.path.exists(db_path) and hasattr(settings, 'PROJECT_ROOT'):
+            db_path = os.path.join(settings.PROJECT_ROOT, 'data', 'stock_data.db')
+        
+        # 如果方法2也不行，尝试方法3：在项目根目录中查找
+        if not os.path.exists(db_path):
+            # 向上两级查找（假设当前在app目录中）
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            db_path = os.path.join(base_dir, 'data', 'stock_data.db')
+        
+        print(f"尝试连接数据库路径: {db_path}")  # 调试信息
+        
+        # 检查数据库文件是否存在
+        if not os.path.exists(db_path):
+            return None, f"数据库文件不存在: {db_path}"
+        
         # 连接数据库
         conn = sqlite3.connect(db_path)
         
