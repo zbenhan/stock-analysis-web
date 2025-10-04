@@ -10,37 +10,20 @@ matplotlib.use("Agg")  # 必须在任何 pyplot 之前
 import matplotlib.pyplot as plt
 
 def get_random_stock_codes(count=10):
-    """从数据库随机获取股票代码"""
+    """使用 Django ORM 从数据库随机获取股票代码"""
     try:
-        # 方法1：直接使用 BASE_DIR
-        db_path = os.path.join(settings.BASE_DIR, 'data', 'stock_data.db')
+        # 使用 Django ORM 的随机排序
+        from django.db.models import Subquery, OuterRef
+        import random
         
-        # 如果方法1不行，尝试方法2：使用 PROJECT_ROOT（如果存在）
-        if not os.path.exists(db_path) and hasattr(settings, 'PROJECT_ROOT'):
-            db_path = os.path.join(settings.PROJECT_ROOT, 'data', 'stock_data.db')
+        # 方法1：使用 order_by('?') 进行随机排序
+        random_stocks = SecurityInfo.objects.order_by('?')[:count]
         
-        # 如果方法2也不行，尝试方法3：在项目根目录中查找
-        if not os.path.exists(db_path):
-            # 向上两级查找（假设当前在app目录中）
-            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            db_path = os.path.join(base_dir, 'data', 'stock_data.db')
+        # 方法2：如果方法1效率低，可以使用其他随机方法
+        # all_stocks = list(SecurityInfo.objects.all())
+        # random_stocks = random.sample(all_stocks, min(count, len(all_stocks)))
         
-        print(f"尝试连接数据库路径: {db_path}")  # 调试信息
-        
-        # 检查数据库文件是否存在
-        if not os.path.exists(db_path):
-            return None, f"数据库文件不存在: {db_path}"
-        
-        # 连接数据库
-        conn = sqlite3.connect(db_path)
-        
-        # 执行随机查询
-        query = f"SELECT security_code FROM security_info ORDER BY RANDOM() LIMIT {count}"
-        df = pd.read_sql_query(query, conn)
-        conn.close()
-        
-        # 提取前6个字符并返回
-        stock_codes = [str(code)[:6] for code in df['security_code'].tolist()]
+        stock_codes = [stock.security_code[:6] for stock in random_stocks]
         return stock_codes, "成功"
         
     except Exception as e:
