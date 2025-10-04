@@ -9,7 +9,7 @@ import matplotlib
 matplotlib.use("Agg")  # 必须在任何 pyplot 之前
 import matplotlib.pyplot as plt
 
-def get_random_stock_codes(count=10):
+def get_random_stock_codes(count=5):
     """使用 Django ORM 从数据库随机获取股票代码"""
     try:
         # 使用 Django ORM 的随机排序
