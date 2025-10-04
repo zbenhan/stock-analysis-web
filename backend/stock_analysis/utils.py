@@ -124,6 +124,8 @@ def process_data(price_df, financial_df):
 def generate_chart(monthly_last_data, financial_df, stock_info):
     """生成图表"""
     try:
+        print("开始生成图表...")
+        
         # 明确设置matplotlib配置，避免使用系统字体
         import matplotlib
         matplotlib.rcParams.update(matplotlib.rcParamsDefault)
@@ -138,21 +140,25 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         plt.rcParams['axes.unicode_minus'] = False
         
         # 强制重新生成字体缓存
-        import matplotlib.font_manager as fm
-        fm._rebuild()
+        try:
+            import matplotlib.font_manager as fm
+            fm._rebuild()
+            
+            # 打印可用字体用于调试
+            available_fonts = [f.name for f in fm.fontManager.ttflist]
+            print(f"可用字体数量: {len(available_fonts)}")
+            
+            # 检查是否有支持中文的字体
+            chinese_support_fonts = [f for f in available_fonts if any(char in f for char in ['CJK', 'Chinese', 'Unicode'])]
+            print(f"可能支持中文的字体: {chinese_support_fonts}")
+        except Exception as font_error:
+            print(f"字体设置错误: {font_error}")
         
-        # 打印可用字体用于调试
-        available_fonts = [f.name for f in fm.fontManager.ttflist]
-        print(f"可用字体数量: {len(available_fonts)}")
-        
-        # 检查是否有支持中文的字体
-        chinese_support_fonts = [f for f in available_fonts if any(char in f for char in ['CJK', 'Chinese', 'Unicode'])]
-        print(f"可能支持中文的字体: {chinese_support_fonts}")
-        
+        print("创建图表对象...")
         # 创建图表
         fig, ax1 = plt.subplots(figsize=(12, 6))
         
-        # 其余代码保持不变...
+        print("处理数据...")
         # 合并数据
         merged_df = pd.merge(monthly_last_data, financial_df, on='data_date', how='outer')
         merged_df['data_date'] = pd.to_datetime(merged_df['data_date'])
@@ -163,8 +169,10 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         
         # 检查是否有有效数据
         if merged_df['market_capitalization'].isna().all() or merged_df['net_profit_parent_quarterly'].isna().all():
+            print("数据为空，无法生成图表")
             return None
         
+        print("准备绘图数据...")
         # 将日期减1年用于显示
         market_data = merged_df.dropna(subset=['market_capitalization']).sort_values('data_date')
         profit_data = merged_df.dropna(subset=['net_profit_parent_quarterly']).sort_values('data_date')
@@ -173,12 +181,14 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         market_dates_display = market_data['data_date'] - pd.DateOffset(years=1)
         profit_dates_display = profit_data['data_date'] - pd.DateOffset(years=1)
         
+        print("绘制市值图表...")
         # 市值图表 - 使用中文
         color = 'darkblue'
         ax1.set_xlabel('日期', fontsize=12)
         ax1.set_ylabel('市值', color=color, fontsize=12)
         
         if market_data.empty:
+            print("市值数据为空")
             return None
             
         line1 = ax1.plot(market_dates_display, market_data['market_capitalization'],
@@ -187,11 +197,13 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         ax1.tick_params(axis='x', labelsize=8)
         ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
+        print("绘制净利润图表...")
         # 净利润图表 - 使用中文
         ax2 = ax1.twinx()
         color = 'orange'
         
         if profit_data.empty:
+            print("净利润数据为空")
             return None
             
         ax2.set_ylabel('净利润', color=color, fontsize=12)
@@ -201,6 +213,7 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         ax2.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
+        print("设置标题...")
         # 设置标题和格式 - 使用中文
         plt.title(f'{stock_info.security_name}({stock_info.security_code})市值与净利润趋势分析',
                  fontsize=14, pad=20)
@@ -214,6 +227,7 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         # 调整布局
         fig.tight_layout()
         
+        print("保存图表为base64...")
         # 转换为base64
         buffer = io.BytesIO()
         plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
@@ -221,10 +235,12 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         image_base64 = base64.b64encode(buffer.getvalue()).decode()
         plt.close()
         
+        print("图表生成成功!")
         return f"data:image/png;base64,{image_base64}"
         
     except Exception as e:
         print(f"图表生成错误: {e}")
         import traceback
+        print("完整错误堆栈:")
         traceback.print_exc()
         return None
