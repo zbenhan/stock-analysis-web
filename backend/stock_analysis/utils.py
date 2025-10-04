@@ -124,31 +124,33 @@ def process_data(price_df, financial_df):
 def generate_chart(monthly_last_data, financial_df, stock_info):
     """生成图表"""
     try:
-        # 设置中文字体 - 使用系统默认字体，避免依赖外部字体
+        # 明确设置matplotlib配置，避免使用系统字体
+        import matplotlib
+        matplotlib.rcParams.update(matplotlib.rcParamsDefault)
+        
+        # 设置中文字体 - 尝试多种方案
         plt.rcParams['font.sans-serif'] = [
-            'DejaVu Sans',   # 跨平台开源字体，通常已安装
-            'Arial Unicode MS', # 跨平台字体
-            'Arial',         # 通用字体
-            'Liberation Sans', # 常见Linux字体
-            'Bitstream Vera Sans' # 常见Linux字体
+            'DejaVu Sans',        # Linux 系统常见字体
+            'Arial',              # 跨平台字体
+            'Liberation Sans',    # 开源字体
+            'Bitstream Vera Sans' # 开源字体
         ]
         plt.rcParams['axes.unicode_minus'] = False
         
-        # 如果上述字体都不行，尝试下载并使用字体
-        try:
-            import matplotlib.font_manager as fm
-            # 检查是否有可用的中文字体
-            chinese_fonts = [f.name for f in fm.fontManager.ttflist if 'Chinese' in f.name or 'CJK' in f.name]
-            if not chinese_fonts:
-                # 如果没有中文字体，使用默认字体
-                print("警告：未找到中文字体，使用默认字体")
-            else:
-                print(f"找到中文字体: {chinese_fonts[:3]}")  # 显示前3个
-        except Exception as e:
-            print(f"字体检查失败: {e}")
+        # 强制重新生成字体缓存
+        import matplotlib.font_manager as fm
+        fm._rebuild()
         
-        # 创建图表 - 缩小尺寸
-        fig, ax1 = plt.subplots(figsize=(10, 5))
+        # 打印可用字体用于调试
+        available_fonts = [f.name for f in fm.fontManager.ttflist]
+        print(f"可用字体数量: {len(available_fonts)}")
+        
+        # 检查是否有支持中文的字体
+        chinese_support_fonts = [f for f in available_fonts if any(char in f for char in ['CJK', 'Chinese', 'Unicode'])]
+        print(f"可能支持中文的字体: {chinese_support_fonts}")
+        
+        # 创建图表
+        fig, ax1 = plt.subplots(figsize=(12, 6))
         
         # 其余代码保持不变...
         # 合并数据
@@ -171,50 +173,50 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         market_dates_display = market_data['data_date'] - pd.DateOffset(years=1)
         profit_dates_display = profit_data['data_date'] - pd.DateOffset(years=1)
         
-        # 市值图表
+        # 市值图表 - 使用中文
         color = 'darkblue'
-        ax1.set_xlabel('Date')  # 使用英文避免中文问题
-        ax1.set_ylabel('Market Cap', color=color, fontsize=10)
+        ax1.set_xlabel('日期', fontsize=12)
+        ax1.set_ylabel('市值', color=color, fontsize=12)
         
         if market_data.empty:
             return None
             
         line1 = ax1.plot(market_dates_display, market_data['market_capitalization'],
-                        color=color, marker='o', linewidth=2, label='Market Cap', markersize=4)
+                        color=color, marker='o', linewidth=2, label='市值', markersize=4)
         ax1.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax1.tick_params(axis='x', labelsize=8)
         ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
-        # 净利润图表
+        # 净利润图表 - 使用中文
         ax2 = ax1.twinx()
         color = 'orange'
         
         if profit_data.empty:
             return None
             
-        ax2.set_ylabel('Net Profit', color=color, fontsize=10)
+        ax2.set_ylabel('净利润', color=color, fontsize=12)
         line2 = ax2.plot(profit_dates_display, profit_data['net_profit_parent_quarterly'],
                         color=color, marker='s', linewidth=2, linestyle='--', 
-                        label='Net Profit', markersize=4)
+                        label='净利润', markersize=4)
         ax2.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
-        # 设置标题和格式 - 使用英文
-        plt.title(f'{stock_info.security_code} Market Cap vs Net Profit Trend',
-                 fontsize=12, pad=15)
+        # 设置标题和格式 - 使用中文
+        plt.title(f'{stock_info.security_name}({stock_info.security_code})市值与净利润趋势分析',
+                 fontsize=14, pad=20)
         
-        # 图例和网格
+        # 图例和网格 - 使用中文
         lines1, labels1 = ax1.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
-        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=8)
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=10)
         ax1.grid(True, linestyle='--', alpha=0.7)
         
         # 调整布局
         fig.tight_layout()
         
-        # 转换为base64 - 降低DPI以减小文件大小
+        # 转换为base64
         buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=80, bbox_inches='tight')
+        plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
         buffer.seek(0)
         image_base64 = base64.b64encode(buffer.getvalue()).decode()
         plt.close()
