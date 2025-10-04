@@ -16,12 +16,7 @@ def get_random_stock_codes(count=10):
         from django.db.models import Subquery, OuterRef
         import random
         
-        # 方法1：使用 order_by('?') 进行随机排序
         random_stocks = SecurityInfo.objects.order_by('?')[:count]
-        
-        # 方法2：如果方法1效率低，可以使用其他随机方法
-        # all_stocks = list(SecurityInfo.objects.all())
-        # random_stocks = random.sample(all_stocks, min(count, len(all_stocks)))
         
         stock_codes = [stock.security_code[:6] for stock in random_stocks]
         return stock_codes, "成功"
@@ -129,6 +124,20 @@ def process_data(price_df, financial_df):
 def generate_chart(monthly_last_data, financial_df, stock_info):
     """生成图表"""
     try:
+        # 设置中文字体 - 更完整的字体列表
+        plt.rcParams['font.sans-serif'] = [
+            'SimHei',        # 黑体
+            'Microsoft YaHei', # 微软雅黑
+            'Arial Unicode MS', # Arial Unicode
+            'DejaVu Sans',   # 跨平台字体
+            'WenQuanYi Micro Hei', # 文泉驿微米黑
+            'Arial'
+        ]
+        plt.rcParams['axes.unicode_minus'] = False
+        
+        # 创建图表 - 缩小尺寸
+        fig, ax1 = plt.subplots(figsize=(10, 5))  # 从 (12, 6) 缩小到 (10, 5)
+        
         # 合并数据
         merged_df = pd.merge(monthly_last_data, financial_df, on='data_date', how='outer')
         merged_df['data_date'] = pd.to_datetime(merged_df['data_date'])
@@ -141,13 +150,6 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         if merged_df['market_capitalization'].isna().all() or merged_df['net_profit_parent_quarterly'].isna().all():
             return None
         
-        # 设置中文字体
-        plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial']
-        plt.rcParams['axes.unicode_minus'] = False
-        
-        # 创建图表
-        fig, ax1 = plt.subplots(figsize=(12, 6))
-        
         # 将日期减1年用于显示
         market_data = merged_df.dropna(subset=['market_capitalization']).sort_values('data_date')
         profit_data = merged_df.dropna(subset=['net_profit_parent_quarterly']).sort_values('data_date')
@@ -158,15 +160,16 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         
         # 市值图表
         color = 'darkblue'
-        ax1.set_xlabel('日期')
-        ax1.set_ylabel('市值', color=color, fontsize=12)
+        ax1.set_xlabel('日期', fontsize=10)
+        ax1.set_ylabel('市值', color=color, fontsize=10)
         
         if market_data.empty:
             return None
             
         line1 = ax1.plot(market_dates_display, market_data['market_capitalization'],
-                        color=color, marker='o', linewidth=2, label='市值')
-        ax1.tick_params(axis='y', labelcolor=color)
+                        color=color, marker='o', linewidth=2, label='市值', markersize=4)
+        ax1.tick_params(axis='y', labelcolor=color, labelsize=8)
+        ax1.tick_params(axis='x', labelsize=8)
         ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
         # 净利润图表
@@ -176,28 +179,29 @@ def generate_chart(monthly_last_data, financial_df, stock_info):
         if profit_data.empty:
             return None
             
-        ax2.set_ylabel('净利润', color=color, fontsize=12)
+        ax2.set_ylabel('净利润', color=color, fontsize=10)
         line2 = ax2.plot(profit_dates_display, profit_data['net_profit_parent_quarterly'],
-                        color=color, marker='s', linewidth=2, linestyle='--', label='净利润')
-        ax2.tick_params(axis='y', labelcolor=color)
+                        color=color, marker='s', linewidth=2, linestyle='--', 
+                        label='净利润', markersize=4)
+        ax2.tick_params(axis='y', labelcolor=color, labelsize=8)
         ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
         
-        # 设置标题和格式
+        # 设置标题和格式 - 缩小字体
         plt.title(f'{stock_info.security_name}({stock_info.security_code})市值与净利润趋势分析',
-                 fontsize=14, pad=20)
+                 fontsize=12, pad=15)
         
         # 图例和网格
         lines1, labels1 = ax1.get_legend_handles_labels()
         lines2, labels2 = ax2.get_legend_handles_labels()
-        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=8)
         ax1.grid(True, linestyle='--', alpha=0.7)
         
         # 调整布局
         fig.tight_layout()
         
-        # 转换为base64
+        # 转换为base64 - 降低DPI以减小文件大小
         buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
+        plt.savefig(buffer, format='png', dpi=80, bbox_inches='tight')  # 从100降到80
         buffer.seek(0)
         image_base64 = base64.b64encode(buffer.getvalue()).decode()
         plt.close()
