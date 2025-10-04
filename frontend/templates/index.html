@@ -364,6 +364,57 @@
             transform: rotate(1deg) scale(0.98);
         }
 
+        /* 缩小弹窗尺寸的样式 */
+        .modal-xl {
+            max-width: 900px; /* 从默认的1140px缩小到900px */
+        }
+
+        /* 模态框内容区域调整 */
+        .modal-body {
+            padding: 1rem;
+            max-height: 500px; /* 限制最大高度 */
+            overflow-y: auto; /* 如果内容过多可以滚动 */
+        }
+
+        /* 图表图片样式调整 */
+        #chartImage {
+            max-width: 100%;
+            height: auto;
+            max-height: 400px; /* 限制图片最大高度 */
+        }
+
+        /* 模态框标题调整 */
+        .modal-title {
+            font-size: 1.1rem; /* 稍微缩小标题字体 */
+        }
+
+        /* 模态框头部和底部调整 */
+        .modal-header {
+            padding: 0.75rem 1rem;
+        }
+
+        .modal-footer {
+            padding: 0.75rem 1rem;
+        }
+
+        /* 导航按钮调整 */
+        .nav-btn {
+            width: 35px; /* 从40px缩小到35px */
+            height: 35px;
+            font-size: 1rem; /* 从1.2rem缩小到1rem */
+        }
+
+        .chart-counter {
+            font-size: 1rem; /* 从1.1rem缩小到1rem */
+            min-width: 70px; /* 从80px缩小到70px */
+        }
+
+        /* 下载按钮调整 */
+        .btn-download {
+            padding: 6px 15px; /* 从8px 20px缩小 */
+            font-size: 0.9rem; /* 从1rem缩小到0.9rem */
+        }
+
         /* 响应式设计 */
         @media (max-width: 768px) {
             .sidebar {
@@ -403,6 +454,20 @@
             
             .chart-nav {
                 margin: 10px 0;
+            }
+
+            /* 移动设备上进一步缩小弹窗 */
+            .modal-xl {
+                max-width: 95%; /* 在移动设备上使用百分比 */
+                margin: 1rem auto;
+            }
+            
+            .modal-body {
+                max-height: 400px; /* 移动设备上进一步限制高度 */
+            }
+            
+            #chartImage {
+                max-height: 300px; /* 移动设备上图片更小 */
             }
         }
     </style>
