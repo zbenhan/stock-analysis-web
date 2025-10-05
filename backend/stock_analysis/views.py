@@ -3,7 +3,7 @@ import json
 import pandas as pd
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from .utils import get_stock_data, process_data, generate_chart, get_random_stock_codes
+from .utils import get_stock_data, process_data, get_random_stock_codes
 import os
 from django.http import HttpResponse, JsonResponse
 from django.conf import settings
@@ -54,102 +54,73 @@ def index(request):
         return HttpResponse(debug_html)
 
 @csrf_exempt
-def generate_chart_api(request):
+def get_stock_data_api(request):
+    """获取股票原始数据，供前端生成图表"""
     if request.method == 'POST':
         try:
-            # 解析请求数据
+            print("收到股票数据请求")
             data = json.loads(request.body.decode('utf-8'))
             stock_number = data.get('stock_number')
             
             if not stock_number:
                 return JsonResponse({'success': False, 'error': 'empty_input'})
             
-            # 分割多个股票代码
             stock_codes = [code.strip() for code in stock_number.split(';') if code.strip()]
             
             if not stock_codes:
                 return JsonResponse({'success': False, 'error': '未提供有效的股票代码'})
             
-            charts = []
-            success_count = 0
+            stock_data_list = []
             
             for stock_code in stock_codes:
                 try:
+                    print(f"处理股票代码: {stock_code}")
                     # 获取股票数据
                     result, message = get_stock_data(stock_code)
                     if result is None:
-                        charts.append({
-                            'success': False,
-                            'stock_code': stock_code,
-                            'error': message
-                        })
+                        print(f"获取股票数据失败: {message}")
                         continue
                     
                     monthly_data = result['price_data']
                     financial_data = result['financial_data']
                     
-                    # 检查数据是否为空
                     if monthly_data.empty or financial_data.empty:
-                        charts.append({
-                            'success': False,
-                            'stock_code': stock_code,
-                            'error': '获取到的数据为空'
-                        })
+                        print(f"数据为空 - 月度数据: {len(monthly_data)}, 财务数据: {len(financial_data)}")
                         continue
                     
+                    print("开始处理数据...")
                     # 处理数据
                     processed_monthly, processed_financial, process_msg = process_data(monthly_data, financial_data)
                     if processed_monthly is None:
-                        charts.append({
-                            'success': False,
-                            'stock_code': stock_code,
-                            'error': process_msg
-                        })
+                        print(f"数据处理失败: {process_msg}")
                         continue
                     
-                    # 生成图表
-                    chart_base64 = generate_chart(processed_monthly, processed_financial, result['stock_info'])
-                    if chart_base64 is None:
-                        charts.append({
-                            'success': False,
-                            'stock_code': stock_code,
-                            'error': '图表生成失败'
-                        })
-                        continue
-                    
-                    # 成功生成图表
-                    charts.append({
-                        'success': True,
+                    # 准备返回的数据
+                    stock_data = {
                         'stock_code': stock_code,
                         'stock_name': result['stock_info'].security_name,
-                        'chart_data': chart_base64
-                    })
-                    success_count += 1
+                        'market_cap_data': processed_monthly[['data_date', 'market_capitalization']].fillna(0).to_dict('records'),
+                        'profit_data': processed_financial[['data_date', 'net_profit_parent_quarterly']].fillna(0).to_dict('records')
+                    }
+                    
+                    stock_data_list.append(stock_data)
+                    print(f"股票 {stock_code} 数据处理成功")
                     
                 except Exception as e:
-                    charts.append({
-                        'success': False,
-                        'stock_code': stock_code,
-                        'error': f'处理股票 {stock_code} 时发生错误: {str(e)}'
-                    })
-            
-            # 检查是否有成功的图表
-            if success_count == 0:
-                error_messages = [f"{chart['stock_code']}: {chart['error']}" for chart in charts if not chart['success']]
-                return JsonResponse({
-                    'success': False, 
-                    'error': '所有股票代码处理失败:\n' + '\n'.join(error_messages)
-                })
+                    print(f"处理股票 {stock_code} 时发生错误: {str(e)}")
+                    import traceback
+                    traceback.print_exc()
+                    continue
             
             return JsonResponse({
                 'success': True,
-                'charts': charts,
-                'total_count': len(stock_codes),
-                'success_count': success_count,
-                'message': f'成功生成 {success_count} 个图表，失败 {len(stock_codes) - success_count} 个'
+                'stocks_data': stock_data_list,
+                'message': f'成功获取 {len(stock_data_list)} 支股票数据'
             })
             
         except Exception as e:
+            print(f"API错误: {str(e)}")
+            import traceback
             traceback.print_exc()
             return JsonResponse({'success': False, 'error': f'服务器错误: {str(e)}'})
     
