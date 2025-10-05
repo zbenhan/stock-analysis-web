@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- 添加SheetJS库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- 添加Chart.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
     <style>
         /* 保持原有的CSS样式不变 */
         * {
@@ -376,11 +379,10 @@
             overflow-y: auto; /* 如果内容过多可以滚动 */
         }
 
-        /* 图表图片样式调整 */
-        #chartImage {
-            max-width: 100%;
-            height: auto;
-            max-height: 400px; /* 限制图片最大高度 */
+        /* 图表容器样式 */
+        #chartContainer {
+            width: 100%;
+            height: 400px;
         }
 
         /* 模态框标题调整 */
@@ -466,8 +468,8 @@
                 max-height: 400px; /* 移动设备上进一步限制高度 */
             }
             
-            #chartImage {
-                max-height: 300px; /* 移动设备上图片更小 */
+            #chartContainer {
+                height: 300px; /* 移动设备上图表更小 */
             }
         }
     </style>
@@ -524,7 +526,7 @@
                 </div>
                 <div class="modal-body text-center">
                     <div id="chartContainer">
-                        <img id="chartImage" src="" alt="股票分析图表" class="img-fluid">
+                        <canvas id="chartCanvas"></canvas>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -558,10 +560,11 @@
 
 <script>
     // 全局变量存储图表数据
-    let chartDataList = [];
+    let stocksData = [];
     let currentChartIndex = 0;
     let chartModal = null;
     let originalButtonText = '';
+    let currentChart = null;
 
     // 获取CSRF token的辅助函数
     function getCookie(name) {
@@ -609,11 +612,11 @@
         }
         
         // 显示加载状态
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 生成中...';
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 获取数据中...';
         this.disabled = true;
         
-        // 调用生成图表函数
-        generateCharts(stockCode);
+        // 调用获取数据函数
+        getStockData(stockCode);
     });
 
     // 获取随机股票代码
@@ -637,8 +640,8 @@
                 // 将随机股票代码填入文本框
                 document.getElementById('stockCode').value = data.stock_codes;
                 
-                // 使用随机股票代码生成图表
-                generateCharts(data.stock_codes);
+                // 使用随机股票代码获取数据
+                getStockData(data.stock_codes);
             } else {
                 alert('获取随机股票代码失败: ' + data.error);
                 restoreButtonState();
@@ -651,10 +654,10 @@
         });
     }
 
-    // 生成图表函数
-    function generateCharts(stockCode) {
+    // 获取股票数据函数
+    function getStockData(stockCode) {
         // Ajax调用后端API
-        fetch('/api/generate-chart/', {
+        fetch('/api/get-stock-data/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -692,12 +695,12 @@
             console.log('响应数据:', data);
             
             if (data.success) {
-                // 存储图表数据
-                chartDataList = data.charts || [];
+                // 存储股票数据
+                stocksData = data.stocks_data || [];
                 currentChartIndex = 0;
                 
-                if (chartDataList.length === 0) {
-                    alert('未生成任何图表');
+                if (stocksData.length === 0) {
+                    alert('未获取到股票数据');
                     return;
                 }
                 
@@ -711,18 +714,17 @@
                     // 新增：监听模态框隐藏事件，清空文本框
                     document.getElementById('chartModal').addEventListener('hidden.bs.modal', function() {
                         document.getElementById('stockCode').value = '';
+                        // 销毁图表释放内存
+                        if (currentChart) {
+                            currentChart.destroy();
+                            currentChart = null;
+                        }
                     });
                 }
                 chartModal.show();
                 
             } else {
-                // 检查是否是空输入错误
-                if (data.error === 'empty_input') {
-                    // 这里不应该再出现空输入错误，因为我们已经处理了
-                    alert('请输入股票代码');
-                } else {
-                    alert('错误: ' + (data.error || data.message || '未知错误'));
-                }
+                alert('错误: ' + (data.error || data.message || '未知错误'));
             }
         })
         .catch(error => {
@@ -744,22 +746,165 @@
 
     // 显示指定索引的图表
     function showChart(index) {
-        if (index < 0 || index >= chartDataList.length) {
+        if (index < 0 || index >= stocksData.length) {
             return;
         }
         
-        const chartData = chartDataList[index];
-        document.getElementById('chartImage').src = chartData.chart_data;
+        const stockData = stocksData[index];
+        
+        // 销毁之前的图表
+        if (currentChart) {
+            currentChart.destroy();
+        }
+        
+        // 创建新图表
+        const ctx = document.getElementById('chartCanvas').getContext('2d');
+        
+        // 准备数据
+        const marketCapData = stockData.market_cap_data
+            .filter(item => item.market_capitalization > 0)
+            .map(item => ({
+                x: item.data_date,
+                y: item.market_capitalization
+            }));
+        
+        const profitData = stockData.profit_data
+            .filter(item => item.net_profit_parent_quarterly !== null && item.net_profit_parent_quarterly !== 0)
+            .map(item => ({
+                x: item.data_date,
+                y: item.net_profit_parent_quarterly
+            }));
+        
+        currentChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [
+                    {
+                        label: '市值',
+                        data: marketCapData,
+                        borderColor: 'darkblue',
+                        backgroundColor: 'rgba(0, 0, 139, 0.1)',
+                        yAxisID: 'y',
+                        tension: 0.1,
+                        pointRadius: 3,
+                        pointHoverRadius: 5
+                    },
+                    {
+                        label: '净利润',
+                        data: profitData,
+                        borderColor: 'orange',
+                        backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                        yAxisID: 'y1',
+                        tension: 0.1,
+                        pointRadius: 3,
+                        pointHoverRadius: 5,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'month',
+                            tooltipFormat: 'yyyy年MM月'
+                        },
+                        title: {
+                            display: true,
+                            text: '日期'
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '市值'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 100000000) {
+                                    return (value / 100000000).toFixed(2) + '亿';
+                                } else if (value >= 10000) {
+                                    return (value / 10000).toFixed(2) + '万';
+                                }
+                                return value.toLocaleString();
+                            }
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '净利润'
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                if (value >= 100000000) {
+                                    return (value / 100000000).toFixed(2) + '亿';
+                                } else if (value >= 10000) {
+                                    return (value / 10000).toFixed(2) + '万';
+                                }
+                                return value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                },
+                plugins: {
+                    title: {
+                        display: true,
+                        text: `${stockData.stock_name}(${stockData.stock_code})市值与净利润趋势分析`,
+                        font: {
+                            size: 16
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    let value = context.parsed.y;
+                                    if (value >= 100000000) {
+                                        label += (value / 100000000).toFixed(2) + '亿';
+                                    } else if (value >= 10000) {
+                                        label += (value / 10000).toFixed(2) + '万';
+                                    } else {
+                                        label += value.toLocaleString();
+                                    }
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        
+        // 更新标题和计数器
         document.getElementById('chartModalLabel').textContent = 
-            `${chartData.stock_name}(${chartData.stock_code}) - 市值与净利润趋势分析`;
+            `${stockData.stock_name}(${stockData.stock_code}) - 市值与净利润趋势分析`;
         
-        // 更新计数器
         document.getElementById('currentChart').textContent = index + 1;
-        document.getElementById('totalCharts').textContent = chartDataList.length;
+        document.getElementById('totalCharts').textContent = stocksData.length;
         
-        // 更新按钮状态
         document.getElementById('prevChart').disabled = index === 0;
-        document.getElementById('nextChart').disabled = index === chartDataList.length - 1;
+        document.getElementById('nextChart').disabled = index === stocksData.length - 1;
         
         currentChartIndex = index;
     }
@@ -773,7 +918,7 @@
 
     // 下一个图表
     document.getElementById('nextChart').addEventListener('click', function() {
-        if (currentChartIndex < chartDataList.length - 1) {
+        if (currentChartIndex < stocksData.length - 1) {
             showChart(currentChartIndex + 1);
         }
     });
@@ -790,7 +935,7 @@
                     }
                     break;
                 case 'ArrowRight':
-                    if (currentChartIndex < chartDataList.length - 1) {
+                    if (currentChartIndex < stocksData.length - 1) {
                         showChart(currentChartIndex + 1);
                         e.preventDefault();
                     }
@@ -1022,33 +1167,28 @@
             .replace(/'/g, "&#039;");
     }
 
-    // 下载当前图表功能（修改文件名格式）
+    // 下载当前图表功能
     function downloadCurrentChart() {
-        if (chartDataList.length === 0 || currentChartIndex >= chartDataList.length) {
+        if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
             alert('没有可下载的图表');
             return;
         }
         
-        const currentChart = chartDataList[currentChartIndex];
-        
-        // 获取当前日期，格式为 yyyymmdd
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const dateString = `${year}${month}${day}`;
-        
-        // 获取图表标题，移除非法文件名字符
-        const chartTitle = document.getElementById('chartModalLabel').textContent;
-        const safeFileName = chartTitle
-            .replace(/[\\/:*?"<>|]/g, '') // 移除非法字符
-            .replace(/\s+/g, '_') // 将空格替换为下划线
-            .substring(0, 100); // 限制文件名长度
-        
-        const link = document.createElement('a');
-        link.download = `${safeFileName}_${dateString}.png`;
-        link.href = currentChart.chart_data;
-        link.click();
+        if (currentChart) {
+            const link = document.createElement('a');
+            const stockData = stocksData[currentChartIndex];
+            
+            // 获取当前日期，格式为 yyyymmdd
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const dateString = `${year}${month}${day}`;
+            
+            link.download = `${stockData.stock_name}(${stockData.stock_code})_${dateString}.png`;
+            link.href = currentChart.toBase64Image();
+            link.click();
+        }
     }
 
     // 输入框回车键支持
