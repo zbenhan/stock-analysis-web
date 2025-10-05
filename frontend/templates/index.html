@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>市值&净利润折线图 - 股票价值分析平台</title>
+    <title>股票价值分析平台</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- 添加SheetJS库 -->
@@ -383,6 +383,7 @@
         #chartContainer {
             width: 100%;
             height: 400px;
+            position: relative;
         }
 
         /* 模态框标题调整 */
@@ -417,7 +418,7 @@
             font-size: 0.9rem; /* 从1rem缩小到0.9rem */
         }
 
-        /* 响应式设计 */
+        /* 响应式设计 - 增强移动设备适配 */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -431,6 +432,10 @@
             .header-title {
                 font-size: 1.8rem;
                 margin-left: 15px;
+            }
+            
+            .content-area {
+                padding: 20px 15px;
             }
             
             .control-panel {
@@ -466,10 +471,56 @@
             
             .modal-body {
                 max-height: 400px; /* 移动设备上进一步限制高度 */
+                padding: 0.5rem;
             }
             
             #chartContainer {
                 height: 300px; /* 移动设备上图表更小 */
+            }
+            
+            /* 移动设备上调整字体大小 */
+            .modal-title {
+                font-size: 1rem;
+            }
+            
+            .btn-download {
+                font-size: 0.8rem;
+                padding: 5px 12px;
+            }
+        }
+
+        /* 超小屏幕设备 */
+        @media (max-width: 480px) {
+            .header-title {
+                font-size: 1.5rem;
+                margin-left: 10px;
+            }
+            
+            .content-area {
+                padding: 15px 10px;
+            }
+            
+            .control-panel {
+                padding: 20px 10px;
+            }
+            
+            #chartContainer {
+                height: 250px; /* 超小屏幕上图表更小 */
+            }
+            
+            .modal-xl {
+                max-width: 98%;
+            }
+        }
+
+        /* 横屏手机优化 */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .modal-body {
+                max-height: 250px;
+            }
+            
+            #chartContainer {
+                height: 200px;
             }
         }
     </style>
@@ -852,32 +903,52 @@
                         }
                     },
                     tooltip: {
+                        mode: 'index',
+                        intersect: false,
                         callbacks: {
+                            title: function(context) {
+                                // 显示悬停时间点的日期，格式为"YYYY年MM月"
+                                const date = new Date(context[0].parsed.x);
+                                return `${date.getFullYear()}年${date.getMonth() + 1}月`;
+                            },
                             label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
+                                const datasetLabel = context.dataset.label || '';
+                                const value = context.parsed.y;
+                                
+                                // 如果该数据点没有值，则不显示
+                                if (value === null || value === undefined || isNaN(value)) {
+                                    return null;
                                 }
-                                if (context.parsed.y !== null) {
-                                    let value = context.parsed.y;
-                                    let unit = '';
-                                    let divisor = 1;
-                                    
-                                    if (context.dataset.label === '市值') {
-                                        unit = marketCapUnit;
-                                        divisor = marketCapDivisor;
-                                    } else if (context.dataset.label === '净利润') {
-                                        unit = profitUnit;
-                                        divisor = profitDivisor;
-                                    }
-                                    
-                                    if (divisor > 1) {
-                                        label += (value / divisor).toFixed(2) + unit;
-                                    } else {
-                                        label += value.toLocaleString();
-                                    }
+                                
+                                let unit = '';
+                                let divisor = 1;
+                                
+                                if (datasetLabel === '市值') {
+                                    unit = marketCapUnit;
+                                    divisor = marketCapDivisor;
+                                } else if (datasetLabel === '净利润') {
+                                    unit = profitUnit;
+                                    divisor = profitDivisor;
                                 }
-                                return label;
+                                
+                                let formattedValue;
+                                if (divisor > 1) {
+                                    formattedValue = (value / divisor).toFixed(2) + unit;
+                                } else {
+                                    formattedValue = value.toLocaleString();
+                                }
+                                return `${datasetLabel}: ${formattedValue}`;
+                            },
+                            afterBody: function(context) {
+                                // 检查是否有数据点没有值
+                                const missingData = context.filter(item => 
+                                    item.parsed.y === null || item.parsed.y === undefined || isNaN(item.parsed.y)
+                                );
+                                
+                                if (missingData.length > 0) {
+                                    return ['无数据的时间点'];
+                                }
+                                return [];
                             }
                         }
                     }
@@ -886,7 +957,7 @@
                     x: {
                         type: 'time',
                         time: {
-                            unit: 'year', // 只显示整年
+                            unit: 'year',
                             displayFormats: {
                                 year: 'yyyy年'
                             },
@@ -898,26 +969,49 @@
                         },
                         grid: {
                             color: function(context) {
-                                // 季度线 - 浅灰色细线
-                                if (context.tick && context.tick.major) {
-                                    return 'rgba(200, 200, 200, 0.3)';
+                                const date = new Date(context.tick.value);
+                                const month = date.getMonth() + 1; // 月份从0开始，所以+1
+                                
+                                // 12月份显示年线（粗线）
+                                if (month === 12) {
+                                    return 'rgba(100, 100, 100, 0.7)';
                                 }
-                                // 年线 - 深灰色粗线
-                                return 'rgba(100, 100, 100, 0.5)';
+                                // 3月、6月、9月显示季度线
+                                else if (month === 3 || month === 6 || month === 9) {
+                                    return 'rgba(100, 100, 100, 0.3)';
+                                }
+                                // 其他月份不显示网格线
+                                return 'rgba(0, 0, 0, 0)';
                             },
                             lineWidth: function(context) {
-                                // 季度线细，年线粗
-                                if (context.tick && context.tick.major) {
+                                const date = new Date(context.tick.value);
+                                const month = date.getMonth() + 1;
+                                
+                                // 12月份显示年线（粗线）
+                                if (month === 12) {
+                                    return 2;
+                                }
+                                // 3月、6月、9月显示季度线
+                                else if (month === 3 || month === 6 || month === 9) {
                                     return 1;
                                 }
-                                return 2;
+                                // 其他月份不显示网格线
+                                return 0;
                             }
                         },
                         ticks: {
                             // 只显示整年刻度
-                            source: 'auto',
+                            source: 'data',
                             autoSkip: true,
-                            maxTicksLimit: 10
+                            maxTicksLimit: 10,
+                            callback: function(value, index, ticks) {
+                                const date = new Date(value);
+                                // 只在12月份显示年份标签
+                                if (date.getMonth() === 11) { // 11表示12月
+                                    return date.getFullYear() + '年';
+                                }
+                                return '';
+                            }
                         }
                     },
                     y: {
