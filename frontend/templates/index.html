@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>股票价值分析平台</title>
+    <title>市值&净利润折线图 - 股票价值分析平台</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- 添加SheetJS库 -->
@@ -316,7 +316,7 @@
             text-align: center;
         }
 
-        /* 修改：模态框底部布局调整 - 下载按钮在左侧，导航居中，数据下载按钮在右侧 */
+        /* 修改：模态框底部布局调整 - 下载按钮在左侧，导航居中 */
         .modal-footer {
             display: flex;
             justify-content: space-between;
@@ -329,7 +329,7 @@
         .footer-left {
             display: flex;
             align-items: center;
-            order: 1; /* 将下载图表按钮放在左侧 */
+            order: 1; /* 将下载按钮放在左侧 */
         }
 
         .footer-center {
@@ -337,12 +337,6 @@
             display: flex;
             justify-content: center;
             order: 2; /* 将导航放在中间 */
-        }
-
-        .footer-right {
-            display: flex;
-            align-items: center;
-            order: 3; /* 将下载数据按钮放在右侧 */
         }
 
         /* 下载按钮样式 - 使用页面顶框的颜色 */
@@ -389,7 +383,6 @@
         #chartContainer {
             width: 100%;
             height: 400px;
-            position: relative;
         }
 
         /* 模态框标题调整 */
@@ -424,7 +417,7 @@
             font-size: 0.9rem; /* 从1rem缩小到0.9rem */
         }
 
-        /* 响应式设计 - 增强移动设备适配 */
+        /* 响应式设计 */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -438,10 +431,6 @@
             .header-title {
                 font-size: 1.8rem;
                 margin-left: 15px;
-            }
-            
-            .content-area {
-                padding: 20px 15px;
             }
             
             .control-panel {
@@ -459,7 +448,7 @@
                 gap: 15px;
             }
             
-            .footer-left, .footer-center, .footer-right {
+            .footer-left, .footer-center {
                 width: 100%;
                 justify-content: center;
                 order: unset;
@@ -477,56 +466,10 @@
             
             .modal-body {
                 max-height: 400px; /* 移动设备上进一步限制高度 */
-                padding: 0.5rem;
             }
             
             #chartContainer {
                 height: 300px; /* 移动设备上图表更小 */
-            }
-            
-            /* 移动设备上调整字体大小 */
-            .modal-title {
-                font-size: 1rem;
-            }
-            
-            .btn-download {
-                font-size: 0.8rem;
-                padding: 5px 12px;
-            }
-        }
-
-        /* 超小屏幕设备 */
-        @media (max-width: 480px) {
-            .header-title {
-                font-size: 1.5rem;
-                margin-left: 10px;
-            }
-            
-            .content-area {
-                padding: 15px 10px;
-            }
-            
-            .control-panel {
-                padding: 20px 10px;
-            }
-            
-            #chartContainer {
-                height: 250px; /* 超小屏幕上图表更小 */
-            }
-            
-            .modal-xl {
-                max-width: 98%;
-            }
-        }
-
-        /* 横屏手机优化 */
-        @media (max-height: 500px) and (orientation: landscape) {
-            .modal-body {
-                max-height: 250px;
-            }
-            
-            #chartContainer {
-                height: 200px;
             }
         }
     </style>
@@ -587,14 +530,14 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <!-- 左侧：下载当前图表按钮 -->
+                    <!-- 修改：下载按钮放在左侧 -->
                     <div class="footer-left">
                         <button type="button" class="btn-download" onclick="downloadCurrentChart()">
                             <i class="fas fa-download"></i> 下载当前图表
                         </button>
                     </div>
-                    <!-- 中间：图表导航 -->
                     <div class="footer-center">
+                        <!-- 图表导航居中 -->
                         <div class="chart-nav">
                             <button class="nav-btn" id="prevChart" title="上一个图表 (左箭头)">
                                 <i class="fas fa-chevron-left"></i>
@@ -606,12 +549,6 @@
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
-                    </div>
-                    <!-- 右侧：下载当前数据按钮 -->
-                    <div class="footer-right">
-                        <button type="button" class="btn-download" onclick="downloadCurrentData()">
-                            <i class="fas fa-table"></i> 下载当前数据
-                        </button>
                     </div>
                 </div>
             </div>
@@ -807,17 +744,6 @@
         confirmBtn.disabled = false;
     }
 
-    // 格式化数值，去掉小数点后多余的0
-    function formatNumber(value, divisor, unit) {
-        if (divisor > 1) {
-            const num = value / divisor;
-            // 去掉小数点后多余的0
-            const formatted = num.toFixed(2).replace(/\.?0+$/, '');
-            return formatted + unit;
-        }
-        return value.toLocaleString();
-    }
-
     // 显示指定索引的图表
     function showChart(index) {
         if (index < 0 || index >= stocksData.length) {
@@ -903,6 +829,7 @@
                         pointRadius: 3,
                         pointHoverRadius: 5,
                         borderWidth: 2
+                        // 移除了 borderDash，使连线变为实线
                     }
                 ]
             },
@@ -910,7 +837,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: {
-                    mode: 'nearest',
+                    mode: 'index',
                     intersect: false,
                 },
                 plugins: {
@@ -925,35 +852,72 @@
                         }
                     },
                     tooltip: {
-                        enabled: false // 禁用悬停提示
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    let value = context.parsed.y;
+                                    let unit = '';
+                                    let divisor = 1;
+                                    
+                                    if (context.dataset.label === '市值') {
+                                        unit = marketCapUnit;
+                                        divisor = marketCapDivisor;
+                                    } else if (context.dataset.label === '净利润') {
+                                        unit = profitUnit;
+                                        divisor = profitDivisor;
+                                    }
+                                    
+                                    if (divisor > 1) {
+                                        label += (value / divisor).toFixed(2) + unit;
+                                    } else {
+                                        label += value.toLocaleString();
+                                    }
+                                }
+                                return label;
+                            }
+                        }
                     }
                 },
                 scales: {
                     x: {
                         type: 'time',
                         time: {
-                            unit: 'year',
+                            unit: 'year', // 只显示整年
                             displayFormats: {
                                 year: 'yyyy年'
-                            }
+                            },
+                            tooltipFormat: 'yyyy年MM月'
                         },
                         title: {
                             display: true,
                             text: '日期'
                         },
                         grid: {
-                            color: 'rgba(100, 100, 100, 0.2)',
-                            drawOnChartArea: true
+                            color: function(context) {
+                                // 季度线 - 浅灰色细线
+                                if (context.tick && context.tick.major) {
+                                    return 'rgba(200, 200, 200, 0.3)';
+                                }
+                                // 年线 - 深灰色粗线
+                                return 'rgba(100, 100, 100, 0.5)';
+                            },
+                            lineWidth: function(context) {
+                                // 季度线细，年线粗
+                                if (context.tick && context.tick.major) {
+                                    return 1;
+                                }
+                                return 2;
+                            }
                         },
                         ticks: {
-                            // 显示年份标签
+                            // 只显示整年刻度
                             source: 'auto',
                             autoSkip: true,
-                            maxTicksLimit: 10,
-                            callback: function(value, index, ticks) {
-                                const date = new Date(value);
-                                return date.getFullYear() + '年';
-                            }
+                            maxTicksLimit: 10
                         }
                     },
                     y: {
@@ -963,19 +927,22 @@
                         title: {
                             display: true,
                             text: '市值',
-                            color: 'darkblue',
+                            color: 'darkblue', // 蓝色标题
                             font: {
                                 weight: 'bold'
                             }
                         },
                         ticks: {
-                            color: 'darkblue',
+                            color: 'darkblue', // 蓝色刻度
                             callback: function(value) {
-                                return formatNumber(value, marketCapDivisor, marketCapUnit);
+                                if (marketCapDivisor > 1) {
+                                    return (value / marketCapDivisor).toFixed(2) + marketCapUnit;
+                                }
+                                return value.toLocaleString();
                             }
                         },
                         grid: {
-                            color: 'rgba(0, 0, 139, 0.1)'
+                            color: 'rgba(0, 0, 139, 0.1)' // 浅蓝色网格线
                         }
                     },
                     y1: {
@@ -985,21 +952,23 @@
                         title: {
                             display: true,
                             text: '净利润',
-                            color: 'orange',
+                            color: 'orange', // 橘黄色标题
                             font: {
                                 weight: 'bold'
                             }
                         },
                         ticks: {
-                            color: 'orange',
+                            color: 'orange', // 橘黄色刻度
                             callback: function(value) {
-                                return formatNumber(value, profitDivisor, profitUnit);
+                                if (profitDivisor > 1) {
+                                    return (value / profitDivisor).toFixed(2) + profitUnit;
+                                }
+                                return value.toLocaleString();
                             }
                         },
                         grid: {
-                            color: 'rgba(255, 165, 0, 0.1)',
-                            drawOnChartArea: true
-                        }
+                            drawOnChartArea: false, // 不在图表区域绘制右侧Y轴网格线
+                        },
                     }
                 }
             }
@@ -1298,64 +1267,6 @@
             link.href = currentChart.toBase64Image();
             link.click();
         }
-    }
-
-    // 下载当前数据功能
-    function downloadCurrentData() {
-        if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
-            alert('没有可下载的数据');
-            return;
-        }
-        
-        const stockData = stocksData[currentChartIndex];
-        
-        // 准备数据
-        let csvContent = "日期,市值,净利润\n";
-        
-        // 获取所有日期
-        const allDates = new Set();
-        stockData.market_cap_data.forEach(item => allDates.add(item.data_date));
-        stockData.profit_data.forEach(item => allDates.add(item.data_date));
-        
-        // 按日期排序
-        const sortedDates = Array.from(allDates).sort();
-        
-        // 创建数据映射
-        const marketCapMap = new Map();
-        stockData.market_cap_data.forEach(item => {
-            marketCapMap.set(item.data_date, item.market_capitalization);
-        });
-        
-        const profitMap = new Map();
-        stockData.profit_data.forEach(item => {
-            profitMap.set(item.data_date, item.net_profit_parent_quarterly);
-        });
-        
-        // 生成CSV内容
-        sortedDates.forEach(date => {
-            const marketCap = marketCapMap.get(date) || '';
-            const profit = profitMap.get(date) || '';
-            csvContent += `${date},${marketCap},${profit}\n`;
-        });
-        
-        // 创建下载链接
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        
-        // 获取当前日期，格式为 yyyymmdd
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const dateString = `${year}${month}${day}`;
-        
-        link.setAttribute('href', url);
-        link.setAttribute('download', `${stockData.stock_name}(${stockData.stock_code})_数据_${dateString}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
     }
 
     // 输入框回车键支持
