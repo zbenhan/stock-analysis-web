@@ -5,9 +5,6 @@ import sqlite3
 import os
 from django.conf import settings
 from .models import SecurityInfo, ClosingPrice, FinancialReport
-import matplotlib
-matplotlib.use("Agg")  # 必须在任何 pyplot 之前
-import matplotlib.pyplot as plt
 
 def get_random_stock_codes(count=10):
     """使用 Django ORM 从数据库随机获取股票代码"""
@@ -120,98 +117,3 @@ def process_data(price_df, financial_df):
         
     except Exception as e:
         return None, None, f"数据处理失败: {str(e)}"
-
-def generate_chart(monthly_last_data, financial_df, stock_info):
-    """生成图表 - 简化版本，避免字体问题"""
-    try:
-        print("开始生成图表...")
-        
-        # 完全重置matplotlib配置
-        import matplotlib
-        matplotlib.rcParams.update(matplotlib.rcParamsDefault)
-        
-        # 使用最基本的字体设置
-        plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'Arial']
-        plt.rcParams['axes.unicode_minus'] = False
-        
-        # 创建图表
-        fig, ax1 = plt.subplots(figsize=(12, 6))
-        
-        # 合并数据
-        merged_df = pd.merge(monthly_last_data, financial_df, on='data_date', how='outer')
-        merged_df['data_date'] = pd.to_datetime(merged_df['data_date'])
-        merged_df = merged_df.sort_values('data_date')
-        
-        merged_df['market_capitalization'] = pd.to_numeric(merged_df['market_capitalization'], errors='coerce')
-        merged_df['net_profit_parent_quarterly'] = pd.to_numeric(merged_df['net_profit_parent_quarterly'], errors='coerce')
-        
-        # 检查是否有有效数据
-        if merged_df['market_capitalization'].isna().all() or merged_df['net_profit_parent_quarterly'].isna().all():
-            print("数据为空，无法生成图表")
-            return None
-        
-        # 将日期减1年用于显示
-        market_data = merged_df.dropna(subset=['market_capitalization']).sort_values('data_date')
-        profit_data = merged_df.dropna(subset=['net_profit_parent_quarterly']).sort_values('data_date')
-        
-        # 创建减1年后的日期用于x轴标签
-        market_dates_display = market_data['data_date'] - pd.DateOffset(years=1)
-        profit_dates_display = profit_data['data_date'] - pd.DateOffset(years=1)
-        
-        # 市值图表 - 暂时使用英文
-        color = 'darkblue'
-        ax1.set_xlabel('Date', fontsize=12)  # 暂时用英文
-        ax1.set_ylabel('Market Cap', color=color, fontsize=12)
-        
-        if market_data.empty:
-            return None
-            
-        line1 = ax1.plot(market_dates_display, market_data['market_capitalization'],
-                        color=color, marker='o', linewidth=2, label='Market Cap', markersize=4)
-        ax1.tick_params(axis='y', labelcolor=color, labelsize=8)
-        ax1.tick_params(axis='x', labelsize=8)
-        ax1.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
-        
-        # 净利润图表 - 暂时使用英文
-        ax2 = ax1.twinx()
-        color = 'orange'
-        
-        if profit_data.empty:
-            return None
-            
-        ax2.set_ylabel('Net Profit', color=color, fontsize=12)
-        line2 = ax2.plot(profit_dates_display, profit_data['net_profit_parent_quarterly'],
-                        color=color, marker='s', linewidth=2, linestyle='--', 
-                        label='Net Profit', markersize=4)
-        ax2.tick_params(axis='y', labelcolor=color, labelsize=8)
-        ax2.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, p: format(int(x), ',')))
-        
-        # 设置标题和格式 - 暂时使用英文
-        plt.title(f'{stock_info.security_code} Market Cap vs Net Profit Trend',
-                 fontsize=14, pad=20)
-        
-        # 图例和网格
-        lines1, labels1 = ax1.get_legend_handles_labels()
-        lines2, labels2 = ax2.get_legend_handles_labels()
-        ax1.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=10)
-        ax1.grid(True, linestyle='--', alpha=0.7)
-        
-        # 调整布局
-        fig.tight_layout()
-        
-        # 转换为base64
-        buffer = io.BytesIO()
-        plt.savefig(buffer, format='png', dpi=100, bbox_inches='tight')
-        buffer.seek(0)
-        image_base64 = base64.b64encode(buffer.getvalue()).decode()
-        plt.close()
-        
-        print("图表生成成功!")
-        return f"data:image/png;base64,{image_base64}"
-        
-    except Exception as e:
-        print(f"图表生成错误: {e}")
-        import traceback
-        print("完整错误堆栈:")
-        traceback.print_exc()
-        return None
