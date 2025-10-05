@@ -775,6 +775,35 @@
                 y: item.net_profit_parent_quarterly
             }));
         
+        // 计算Y轴的单位
+        const marketCapValues = marketCapData.map(item => Math.abs(item.y));
+        const profitValues = profitData.map(item => Math.abs(item.y));
+        
+        const maxMarketCap = Math.max(...marketCapValues);
+        const maxProfit = Math.max(...profitValues);
+        
+        // 确定市值轴的单位
+        let marketCapUnit = '';
+        let marketCapDivisor = 1;
+        if (maxMarketCap >= 100000000) {
+            marketCapUnit = '亿';
+            marketCapDivisor = 100000000;
+        } else if (maxMarketCap >= 10000) {
+            marketCapUnit = '万';
+            marketCapDivisor = 10000;
+        }
+        
+        // 确定净利润轴的单位
+        let profitUnit = '';
+        let profitDivisor = 1;
+        if (maxProfit >= 100000000) {
+            profitUnit = '亿';
+            profitDivisor = 100000000;
+        } else if (maxProfit >= 10000) {
+            profitUnit = '万';
+            profitDivisor = 10000;
+        }
+        
         currentChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -787,7 +816,8 @@
                         yAxisID: 'y',
                         tension: 0.1,
                         pointRadius: 3,
-                        pointHoverRadius: 5
+                        pointHoverRadius: 5,
+                        borderWidth: 2
                     },
                     {
                         label: '净利润',
@@ -798,7 +828,8 @@
                         tension: 0.1,
                         pointRadius: 3,
                         pointHoverRadius: 5,
-                        borderDash: [5, 5]
+                        borderWidth: 2
+                        // 移除了 borderDash，使连线变为实线
                     }
                 ]
             },
@@ -809,61 +840,10 @@
                     mode: 'index',
                     intersect: false,
                 },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'month',
-                            tooltipFormat: 'yyyy年MM月'
-                        },
-                        title: {
-                            display: true,
-                            text: '日期'
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: '市值'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                if (value >= 100000000) {
-                                    return (value / 100000000).toFixed(2) + '亿';
-                                } else if (value >= 10000) {
-                                    return (value / 10000).toFixed(2) + '万';
-                                }
-                                return value.toLocaleString();
-                            }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: '净利润'
-                        },
-                        ticks: {
-                            callback: function(value) {
-                                if (value >= 100000000) {
-                                    return (value / 100000000).toFixed(2) + '亿';
-                                } else if (value >= 10000) {
-                                    return (value / 10000).toFixed(2) + '万';
-                                }
-                                return value.toLocaleString();
-                            }
-                        },
-                        grid: {
-                            drawOnChartArea: false,
-                        },
-                    }
-                },
                 plugins: {
+                    legend: {
+                        display: false // 隐藏图例
+                    },
                     title: {
                         display: true,
                         text: `${stockData.stock_name}(${stockData.stock_code})市值与净利润趋势分析`,
@@ -880,10 +860,19 @@
                                 }
                                 if (context.parsed.y !== null) {
                                     let value = context.parsed.y;
-                                    if (value >= 100000000) {
-                                        label += (value / 100000000).toFixed(2) + '亿';
-                                    } else if (value >= 10000) {
-                                        label += (value / 10000).toFixed(2) + '万';
+                                    let unit = '';
+                                    let divisor = 1;
+                                    
+                                    if (context.dataset.label === '市值') {
+                                        unit = marketCapUnit;
+                                        divisor = marketCapDivisor;
+                                    } else if (context.dataset.label === '净利润') {
+                                        unit = profitUnit;
+                                        divisor = profitDivisor;
+                                    }
+                                    
+                                    if (divisor > 1) {
+                                        label += (value / divisor).toFixed(2) + unit;
                                     } else {
                                         label += value.toLocaleString();
                                     }
@@ -891,6 +880,95 @@
                                 return label;
                             }
                         }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            unit: 'year', // 只显示整年
+                            displayFormats: {
+                                year: 'yyyy年'
+                            },
+                            tooltipFormat: 'yyyy年MM月'
+                        },
+                        title: {
+                            display: true,
+                            text: '日期'
+                        },
+                        grid: {
+                            color: function(context) {
+                                // 季度线 - 浅灰色细线
+                                if (context.tick && context.tick.major) {
+                                    return 'rgba(200, 200, 200, 0.3)';
+                                }
+                                // 年线 - 深灰色粗线
+                                return 'rgba(100, 100, 100, 0.5)';
+                            },
+                            lineWidth: function(context) {
+                                // 季度线细，年线粗
+                                if (context.tick && context.tick.major) {
+                                    return 1;
+                                }
+                                return 2;
+                            }
+                        },
+                        ticks: {
+                            // 只显示整年刻度
+                            source: 'auto',
+                            autoSkip: true,
+                            maxTicksLimit: 10
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: '市值',
+                            color: 'darkblue', // 蓝色标题
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: 'darkblue', // 蓝色刻度
+                            callback: function(value) {
+                                if (marketCapDivisor > 1) {
+                                    return (value / marketCapDivisor).toFixed(2) + marketCapUnit;
+                                }
+                                return value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(0, 0, 139, 0.1)' // 浅蓝色网格线
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: '净利润',
+                            color: 'orange', // 橘黄色标题
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        ticks: {
+                            color: 'orange', // 橘黄色刻度
+                            callback: function(value) {
+                                if (profitDivisor > 1) {
+                                    return (value / profitDivisor).toFixed(2) + profitUnit;
+                                }
+                                return value.toLocaleString();
+                            }
+                        },
+                        grid: {
+                            drawOnChartArea: false, // 不在图表区域绘制右侧Y轴网格线
+                        },
                     }
                 }
             }
