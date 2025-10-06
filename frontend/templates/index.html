@@ -449,6 +449,7 @@
                 align-items: center;
             }
             
+            /* 移动设备上模态框底部布局调整 */
             .modal-footer {
                 flex-direction: column;
                 gap: 15px;
@@ -458,6 +459,15 @@
                 width: 100%;
                 justify-content: center;
                 order: unset;
+            }
+            
+            /* 移动设备上按钮并排显示 */
+            .footer-buttons {
+                display: flex;
+                justify-content: center;
+                gap: 15px;
+                width: 100%;
+                order: 3; /* 放在最下面 */
             }
             
             .chart-nav {
@@ -566,6 +576,15 @@
                     </div>
                     <!-- 修改：下载数据按钮放在右侧 -->
                     <div class="footer-right">
+                        <button type="button" class="btn-download" onclick="downloadCurrentData()">
+                            <i class="fas fa-table"></i> 下载数据
+                        </button>
+                    </div>
+                    <!-- 新增：移动设备上并排显示的按钮 -->
+                    <div class="footer-buttons d-none">
+                        <button type="button" class="btn-download" onclick="downloadCurrentChart()">
+                            <i class="fas fa-download"></i> 下载图表
+                        </button>
                         <button type="button" class="btn-download" onclick="downloadCurrentData()">
                             <i class="fas fa-table"></i> 下载数据
                         </button>
@@ -841,6 +860,9 @@
             return num.toFixed(2).replace(/\.?0+$/, '');
         }
         
+        // 检测是否为移动设备
+        const isMobile = window.innerWidth <= 768;
+        
         currentChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -852,8 +874,8 @@
                         backgroundColor: 'rgba(0, 0, 139, 0.1)',
                         yAxisID: 'y',
                         tension: 0.1,
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
+                        pointRadius: isMobile ? 2 : 3, // 移动设备上节点更小
+                        pointHoverRadius: isMobile ? 3 : 5,
                         borderWidth: 2
                     },
                     {
@@ -863,8 +885,8 @@
                         backgroundColor: 'rgba(255, 165, 0, 0.1)',
                         yAxisID: 'y1',
                         tension: 0.1,
-                        pointRadius: 3,
-                        pointHoverRadius: 5,
+                        pointRadius: isMobile ? 2 : 3, // 移动设备上节点更小
+                        pointHoverRadius: isMobile ? 3 : 5,
                         borderWidth: 2
                     }
                 ]
@@ -884,7 +906,7 @@
                         display: true,
                         text: `${stockData.stock_name}(${stockData.stock_code})市值与净利润趋势分析`,
                         font: {
-                            size: 16
+                            size: isMobile ? 14 : 16 // 移动设备上标题更小
                         }
                     },
                     tooltip: {
@@ -895,9 +917,9 @@
                     x: {
                         type: 'time',
                         time: {
-                            unit: 'year', // 只显示整年
+                            unit: 'quarter', // 修改为季度显示
                             displayFormats: {
-                                year: 'yyyy年'
+                                quarter: 'yyyy-Q'
                             },
                             tooltipFormat: 'yyyy年MM月'
                         },
@@ -923,10 +945,10 @@
                             }
                         },
                         ticks: {
-                            // 只显示整年刻度
+                            // 显示季度刻度
                             source: 'auto',
                             autoSkip: true,
-                            maxTicksLimit: 10
+                            maxTicksLimit: isMobile ? 8 : 12
                         }
                     },
                     y: {
@@ -938,7 +960,8 @@
                             text: '市值',
                             color: 'darkblue', // 蓝色标题
                             font: {
-                                weight: 'bold'
+                                weight: 'bold',
+                                size: isMobile ? 12 : 14 // 移动设备上标题更小
                             }
                         },
                         ticks: {
@@ -948,6 +971,9 @@
                                     return formatNumber(value, marketCapDivisor) + marketCapUnit;
                                 }
                                 return value.toLocaleString();
+                            },
+                            font: {
+                                size: isMobile ? 10 : 12 // 移动设备上刻度文字更小
                             }
                         },
                         // 修复纵向背景线样式，与横向保持一致
@@ -978,7 +1004,8 @@
                             text: '净利润',
                             color: 'orange', // 橘黄色标题
                             font: {
-                                weight: 'bold'
+                                weight: 'bold',
+                                size: isMobile ? 12 : 14 // 移动设备上标题更小
                             }
                         },
                         ticks: {
@@ -988,6 +1015,9 @@
                                     return formatNumber(value, profitDivisor) + profitUnit;
                                 }
                                 return value.toLocaleString();
+                            },
+                            font: {
+                                size: isMobile ? 10 : 12 // 移动设备上刻度文字更小
                             }
                         },
                         // 右侧Y轴不显示背景线
@@ -1008,6 +1038,17 @@
         
         document.getElementById('prevChart').disabled = index === 0;
         document.getElementById('nextChart').disabled = index === stocksData.length - 1;
+        
+        // 移动设备上调整按钮布局
+        if (isMobile) {
+            document.querySelector('.footer-buttons').classList.remove('d-none');
+            document.querySelector('.footer-left').classList.add('d-none');
+            document.querySelector('.footer-right').classList.add('d-none');
+        } else {
+            document.querySelector('.footer-buttons').classList.add('d-none');
+            document.querySelector('.footer-left').classList.remove('d-none');
+            document.querySelector('.footer-right').classList.remove('d-none');
+        }
         
         currentChartIndex = index;
     }
@@ -1375,6 +1416,14 @@
     document.getElementById('stockCode').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             document.getElementById('confirmBtn').click();
+        }
+    });
+
+    // 窗口大小变化时重新渲染图表
+    window.addEventListener('resize', function() {
+        if (currentChart && chartModal && document.getElementById('chartModal').classList.contains('show')) {
+            // 重新显示当前图表以应用新的尺寸
+            showChart(currentChartIndex);
         }
     });
 </script>
