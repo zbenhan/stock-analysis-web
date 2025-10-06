@@ -826,6 +826,13 @@
             profitDivisor = 10000;
         }
         
+        // 格式化数值，去除末尾的0
+        function formatNumber(value, divisor) {
+            const num = value / divisor;
+            // 使用toFixed(2)然后去除末尾的0
+            return num.toFixed(2).replace(/\.?0+$/, '');
+        }
+        
         currentChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -858,7 +865,7 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 interaction: {
-                    mode: 'index',
+                    mode: 'nearest',
                     intersect: false,
                 },
                 plugins: {
@@ -873,34 +880,7 @@
                         }
                     },
                     tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    let value = context.parsed.y;
-                                    let unit = '';
-                                    let divisor = 1;
-                                    
-                                    if (context.dataset.label === '市值') {
-                                        unit = marketCapUnit;
-                                        divisor = marketCapDivisor;
-                                    } else if (context.dataset.label === '净利润') {
-                                        unit = profitUnit;
-                                        divisor = profitDivisor;
-                                    }
-                                    
-                                    if (divisor > 1) {
-                                        label += (value / divisor).toFixed(2) + unit;
-                                    } else {
-                                        label += value.toLocaleString();
-                                    }
-                                }
-                                return label;
-                            }
-                        }
+                        enabled: false // 禁用鼠标悬停提示
                     }
                 },
                 scales: {
@@ -957,7 +937,7 @@
                             color: 'darkblue', // 蓝色刻度
                             callback: function(value) {
                                 if (marketCapDivisor > 1) {
-                                    return (value / marketCapDivisor).toFixed(2) + marketCapUnit;
+                                    return formatNumber(value, marketCapDivisor) + marketCapUnit;
                                 }
                                 return value.toLocaleString();
                             }
@@ -997,29 +977,14 @@
                             color: 'orange', // 橘黄色刻度
                             callback: function(value) {
                                 if (profitDivisor > 1) {
-                                    return (value / profitDivisor).toFixed(2) + profitUnit;
+                                    return formatNumber(value, profitDivisor) + profitUnit;
                                 }
                                 return value.toLocaleString();
                             }
                         },
-                        // 修复纵向背景线样式，与横向保持一致
+                        // 右侧Y轴不显示背景线
                         grid: {
-                            color: function(context) {
-                                // 季度线 - 浅灰色细线
-                                if (context.tick && context.tick.major) {
-                                    return 'rgba(200, 200, 200, 0.3)';
-                                }
-                                // 年线 - 深灰色粗线
-                                return 'rgba(100, 100, 100, 0.5)';
-                            },
-                            lineWidth: function(context) {
-                                // 季度线细，年线粗
-                                if (context.tick && context.tick.major) {
-                                    return 1;
-                                }
-                                return 2;
-                            },
-                            drawOnChartArea: true, // 确保在图表区域绘制右侧Y轴网格线
+                            drawOnChartArea: false,
                         },
                     }
                 }
