@@ -330,6 +330,7 @@
             display: flex;
             align-items: center;
             order: 1; /* 将下载按钮放在左侧 */
+            gap: 10px; /* 添加按钮间距 */
         }
 
         .footer-center {
@@ -533,7 +534,10 @@
                     <!-- 修改：下载按钮放在左侧 -->
                     <div class="footer-left">
                         <button type="button" class="btn-download" onclick="downloadCurrentChart()">
-                            <i class="fas fa-download"></i> 下载当前图表
+                            <i class="fas fa-download"></i> 下载图表
+                        </button>
+                        <button type="button" class="btn-download" onclick="downloadCurrentData()">
+                            <i class="fas fa-table"></i> 下载数据
                         </button>
                     </div>
                     <div class="footer-center">
@@ -760,20 +764,30 @@
         // 创建新图表
         const ctx = document.getElementById('chartCanvas').getContext('2d');
         
-        // 准备数据
+        // 准备数据 - 修复年份显示问题：将年份减1
         const marketCapData = stockData.market_cap_data
             .filter(item => item.market_capitalization > 0)
-            .map(item => ({
-                x: item.data_date,
-                y: item.market_capitalization
-            }));
+            .map(item => {
+                const date = new Date(item.data_date);
+                // 年份减1
+                date.setFullYear(date.getFullYear() - 1);
+                return {
+                    x: date,
+                    y: item.market_capitalization
+                };
+            });
         
         const profitData = stockData.profit_data
             .filter(item => item.net_profit_parent_quarterly !== null && item.net_profit_parent_quarterly !== 0)
-            .map(item => ({
-                x: item.data_date,
-                y: item.net_profit_parent_quarterly
-            }));
+            .map(item => {
+                const date = new Date(item.data_date);
+                // 年份减1
+                date.setFullYear(date.getFullYear() - 1);
+                return {
+                    x: date,
+                    y: item.net_profit_parent_quarterly
+                };
+            });
         
         // 计算Y轴的单位
         const marketCapValues = marketCapData.map(item => Math.abs(item.y));
@@ -829,7 +843,6 @@
                         pointRadius: 3,
                         pointHoverRadius: 5,
                         borderWidth: 2
-                        // 移除了 borderDash，使连线变为实线
                     }
                 ]
             },
@@ -1267,6 +1280,83 @@
             link.href = currentChart.toBase64Image();
             link.click();
         }
+    }
+
+    // 下载当前数据功能
+    function downloadCurrentData() {
+        if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
+            alert('没有可下载的数据');
+            return;
+        }
+        
+        const stockData = stocksData[currentChartIndex];
+        
+        // 准备数据表格
+        const marketCapData = stockData.market_cap_data || [];
+        const profitData = stockData.profit_data || [];
+        
+        // 合并数据 - 以日期为键
+        const dataMap = {};
+        
+        // 处理市值数据
+        marketCapData.forEach(item => {
+            const date = new Date(item.data_date);
+            // 年份减1
+            date.setFullYear(date.getFullYear() - 1);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            if (!dataMap[dateStr]) {
+                dataMap[dateStr] = { 日期: dateStr };
+            }
+            dataMap[dateStr]['市值'] = item.market_capitalization;
+        });
+        
+        // 处理净利润数据
+        profitData.forEach(item => {
+            const date = new Date(item.data_date);
+            // 年份减1
+            date.setFullYear(date.getFullYear() - 1);
+            const dateStr = date.toISOString().split('T')[0];
+            
+            if (!dataMap[dateStr]) {
+                dataMap[dateStr] = { 日期: dateStr };
+            }
+            dataMap[dateStr]['净利润'] = item.net_profit_parent_quarterly;
+        });
+        
+        // 转换为数组
+        const dataArray = Object.values(dataMap);
+        
+        // 按日期排序
+        dataArray.sort((a, b) => new Date(a.日期) - new Date(b.日期));
+        
+        if (dataArray.length === 0) {
+            alert('没有可导出的数据');
+            return;
+        }
+        
+        // 创建工作簿
+        const wb = XLSX.utils.book_new();
+        
+        // 创建工作表
+        const ws = XLSX.utils.json_to_sheet(dataArray);
+        
+        // 将工作表添加到工作簿
+        XLSX.utils.book_append_sheet(wb, ws, '股票数据');
+        
+        // 生成Excel文件并下载
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const dateString = `${year}${month}${day}`;
+        
+        // 修复中文列名乱码问题 - 使用UTF-8编码
+        XLSX.writeFile(wb, `${stockData.stock_name}(${stockData.stock_code})_${dateString}.xlsx`, {
+            bookType: 'xlsx',
+            type: 'binary',
+            cellStyles: true
+        });
     }
 
     // 输入框回车键支持
