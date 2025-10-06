@@ -474,8 +474,16 @@
                 max-height: 400px; /* 移动设备上进一步限制高度 */
             }
             
+            /* 修改：移动设备上保持图表宽高比 */
             #chartContainer {
-                height: 300px; /* 移动设备上图表更小 */
+                height: 300px; /* 保持与电脑版相同的宽高比 */
+                position: relative;
+            }
+            
+            /* 确保图表在移动设备上保持比例 */
+            #chartCanvas {
+                width: 100% !important;
+                height: 100% !important;
             }
         }
     </style>
@@ -899,19 +907,19 @@
                         },
                         grid: {
                             color: function(context) {
-                                // 季度线 - 浅灰色细线
+                                // 季度线 - 更淡的浅灰色细线
                                 if (context.tick && context.tick.major) {
-                                    return 'rgba(200, 200, 200, 0.3)';
+                                    return 'rgba(220, 220, 220, 0.2)';
                                 }
-                                // 年线 - 深灰色粗线
-                                return 'rgba(100, 100, 100, 0.5)';
+                                // 年线 - 更淡的深灰色粗线
+                                return 'rgba(150, 150, 150, 0.3)';
                             },
                             lineWidth: function(context) {
-                                // 季度线细，年线粗
+                                // 季度线更细，年线更细
                                 if (context.tick && context.tick.major) {
-                                    return 1;
+                                    return 0.5;
                                 }
-                                return 2;
+                                return 1;
                             }
                         },
                         ticks: {
@@ -945,19 +953,19 @@
                         // 修复纵向背景线样式，与横向保持一致
                         grid: {
                             color: function(context) {
-                                // 季度线 - 浅灰色细线
+                                // 季度线 - 更淡的浅灰色细线
                                 if (context.tick && context.tick.major) {
-                                    return 'rgba(200, 200, 200, 0.3)';
+                                    return 'rgba(220, 220, 220, 0.2)';
                                 }
-                                // 年线 - 深灰色粗线
-                                return 'rgba(100, 100, 100, 0.5)';
+                                // 年线 - 更淡的深灰色粗线
+                                return 'rgba(150, 150, 150, 0.3)';
                             },
                             lineWidth: function(context) {
-                                // 季度线细，年线粗
+                                // 季度线更细，年线更细
                                 if (context.tick && context.tick.major) {
-                                    return 1;
+                                    return 0.5;
                                 }
-                                return 2;
+                                return 1;
                             }
                         }
                     },
