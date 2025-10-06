@@ -316,7 +316,7 @@
             text-align: center;
         }
 
-        /* 修改：模态框底部布局调整 - 下载按钮在左侧，导航居中 */
+        /* 修改：模态框底部布局调整 - 下载按钮在左右两端，导航居中 */
         .modal-footer {
             display: flex;
             justify-content: space-between;
@@ -329,8 +329,7 @@
         .footer-left {
             display: flex;
             align-items: center;
-            order: 1; /* 将下载按钮放在左侧 */
-            gap: 10px; /* 添加按钮间距 */
+            order: 1; /* 将下载图表按钮放在左侧 */
         }
 
         .footer-center {
@@ -338,6 +337,12 @@
             display: flex;
             justify-content: center;
             order: 2; /* 将导航放在中间 */
+        }
+
+        .footer-right {
+            display: flex;
+            align-items: center;
+            order: 3; /* 将下载数据按钮放在右侧 */
         }
 
         /* 下载按钮样式 - 使用页面顶框的颜色 */
@@ -449,7 +454,7 @@
                 gap: 15px;
             }
             
-            .footer-left, .footer-center {
+            .footer-left, .footer-center, .footer-right {
                 width: 100%;
                 justify-content: center;
                 order: unset;
@@ -531,13 +536,10 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <!-- 修改：下载按钮放在左侧 -->
+                    <!-- 修改：下载图表按钮放在左侧 -->
                     <div class="footer-left">
                         <button type="button" class="btn-download" onclick="downloadCurrentChart()">
                             <i class="fas fa-download"></i> 下载图表
-                        </button>
-                        <button type="button" class="btn-download" onclick="downloadCurrentData()">
-                            <i class="fas fa-table"></i> 下载数据
                         </button>
                     </div>
                     <div class="footer-center">
@@ -553,6 +555,12 @@
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </div>
+                    </div>
+                    <!-- 修改：下载数据按钮放在右侧 -->
+                    <div class="footer-right">
+                        <button type="button" class="btn-download" onclick="downloadCurrentData()">
+                            <i class="fas fa-table"></i> 下载数据
+                        </button>
                     </div>
                 </div>
             </div>
@@ -954,8 +962,23 @@
                                 return value.toLocaleString();
                             }
                         },
+                        // 修复纵向背景线样式，与横向保持一致
                         grid: {
-                            color: 'rgba(0, 0, 139, 0.1)' // 浅蓝色网格线
+                            color: function(context) {
+                                // 季度线 - 浅灰色细线
+                                if (context.tick && context.tick.major) {
+                                    return 'rgba(200, 200, 200, 0.3)';
+                                }
+                                // 年线 - 深灰色粗线
+                                return 'rgba(100, 100, 100, 0.5)';
+                            },
+                            lineWidth: function(context) {
+                                // 季度线细，年线粗
+                                if (context.tick && context.tick.major) {
+                                    return 1;
+                                }
+                                return 2;
+                            }
                         }
                     },
                     y1: {
@@ -979,8 +1002,24 @@
                                 return value.toLocaleString();
                             }
                         },
+                        // 修复纵向背景线样式，与横向保持一致
                         grid: {
-                            drawOnChartArea: false, // 不在图表区域绘制右侧Y轴网格线
+                            color: function(context) {
+                                // 季度线 - 浅灰色细线
+                                if (context.tick && context.tick.major) {
+                                    return 'rgba(200, 200, 200, 0.3)';
+                                }
+                                // 年线 - 深灰色粗线
+                                return 'rgba(100, 100, 100, 0.5)';
+                            },
+                            lineWidth: function(context) {
+                                // 季度线细，年线粗
+                                if (context.tick && context.tick.major) {
+                                    return 1;
+                                }
+                                return 2;
+                            },
+                            drawOnChartArea: true, // 确保在图表区域绘制右侧Y轴网格线
                         },
                     }
                 }
