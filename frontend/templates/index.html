@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>市值&净利润折线图 - 股票价值分析平台</title>
+    <title>A-SHARE.TOP    一个A股观察站</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- 添加SheetJS库 -->
@@ -27,6 +27,7 @@
             --sketch-line: #d3d3d3;
             --blue-green: #2cbfc7;
             --light-yellow: #fffacd;
+            --blue-black: #2c3e50; /* 新增蓝黑色 */
         }
 
         body {
@@ -51,24 +52,25 @@
 
         .header-title {
             font-size: 2.2rem;
-            color: var(--pencil-gray);
+            color: var(--blue-black); /* 修改为蓝黑色 */
             display: inline-block;
             position: relative;
             font-weight: normal;
             letter-spacing: 1px;
             margin-left: 30px;
+            font-family: 'Calibri', sans-serif; /* 添加Calibri字体 */
         }
 
-        .header-title::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100%;
-            height: 15px;
-            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0,10 Q30,0 60,10 T120,10' stroke='%234a90e2' stroke-width='2' fill='none' stroke-dasharray='5,5'/%3E%3C/svg%3E") no-repeat center;
-            background-size: contain;
-        }
+            .header-title::after {
+                content: '';
+                position: absolute;
+                bottom: -8px;
+                left: 0;
+                width: 100%;
+                height: 15px;
+                background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20'%3E%3Cpath d='M0,10 Q30,0 60,10 T120,10' stroke='%232c3e50' stroke-width='2' fill='none' stroke-dasharray='5,5'/%3E%3C/svg%3E") no-repeat center;
+                background-size: contain;
+            }
 
         /* 主布局 */
         .main-container {
@@ -83,15 +85,15 @@
             position: relative;
         }
 
-        .sidebar::before {
-            content: '';
-            position: absolute;
-            right: 0;
-            top: 10%;
-            height: 80%;
-            width: 1px;
-            background: linear-gradient(to bottom, transparent, var(--sketch-line), transparent);
-        }
+            .sidebar::before {
+                content: '';
+                position: absolute;
+                right: 0;
+                top: 10%;
+                height: 80%;
+                width: 1px;
+                background: linear-gradient(to bottom, transparent, var(--sketch-line), transparent);
+            }
 
         .nav-item {
             padding: 15px 25px;
@@ -103,52 +105,53 @@
             position: relative;
             font-size: 1.1rem;
             margin: 5px 0;
+            cursor: pointer;
         }
 
-        .nav-item::before {
-            content: '';
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 8px;
-            height: 8px;
-            background: var(--accent-blue);
-            border-radius: 50%;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
+            .nav-item::before {
+                content: '';
+                position: absolute;
+                left: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 8px;
+                height: 8px;
+                background: var(--accent-blue);
+                border-radius: 50%;
+                opacity: 0;
+                transition: opacity 0.3s;
+            }
 
-        .nav-item:hover::before,
-        .nav-item.active::before {
-            opacity: 1;
-        }
+            .nav-item:hover::before,
+            .nav-item.active::before {
+                opacity: 1;
+            }
 
-        .nav-item:hover {
-            color: var(--accent-blue);
-            transform: translateX(5px);
-        }
+            .nav-item:hover {
+                color: var(--accent-blue);
+                transform: translateX(5px);
+            }
 
-        .nav-item.active {
-            color: var(--accent-blue);
-            font-weight: bold;
-        }
+            .nav-item.active {
+                color: var(--accent-blue);
+                font-weight: bold;
+            }
 
-        .nav-item i {
-            margin-right: 10px;
-            font-size: 1.2rem;
-        }
+            .nav-item i {
+                margin-right: 10px;
+                font-size: 1.2rem;
+            }
 
-        /* 主内容区 */
+        /* 主内容区 - 修改：确保内容水平居中 */
         .content-area {
             flex: 1;
             padding: 40px;
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            justify-content: center; /* 水平居中 */
+            align-items: flex-start; /* 顶部对齐 */
         }
 
-        /* 控制面板 */
+        /* 控制面板 - 修改：确保内容居中 */
         .control-panel {
             width: 100%;
             max-width: 600px;
@@ -160,9 +163,10 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            text-align: center; /* 确保文本居中 */
         }
 
-        /* 表单元素 */
+        /* 表单元素 - 修改：确保居中 */
         .form-group {
             margin-bottom: 40px;
             position: relative;
@@ -185,11 +189,11 @@
             text-align: center;
         }
 
-        .form-control:focus {
-            outline: none;
-            border-bottom-color: var(--accent-blue);
-            box-shadow: 0 2px 0 -1px var(--accent-blue);
-        }
+            .form-control:focus {
+                outline: none;
+                border-bottom-color: var(--accent-blue);
+                box-shadow: 0 2px 0 -1px var(--accent-blue);
+            }
 
         /* 按钮 */
         .btn-custom {
@@ -209,16 +213,16 @@
             text-align: center;
         }
 
-        .btn-custom:hover {
-            background: rgba(74, 144, 226, 0.1);
-            border-style: solid;
-            transform: rotate(-1deg) scale(1.02);
-            box-shadow: 0 5px 15px rgba(74, 144, 226, 0.2);
-        }
+            .btn-custom:hover {
+                background: rgba(74, 144, 226, 0.1);
+                border-style: solid;
+                transform: rotate(-1deg) scale(1.02);
+                box-shadow: 0 5px 15px rgba(74, 144, 226, 0.2);
+            }
 
-        .btn-custom:active {
-            transform: rotate(1deg) scale(0.98);
-        }
+            .btn-custom:active {
+                transform: rotate(1deg) scale(0.98);
+            }
 
         /* 链接样式 */
         .link-group {
@@ -241,15 +245,43 @@
             white-space: nowrap;
         }
 
-        .link-custom:hover {
-            color: var(--accent-green);
-            border-color: var(--accent-green);
-            border-style: solid;
-            transform: rotate(-1deg);
+            .link-custom:hover {
+                color: var(--accent-green);
+                border-color: var(--accent-green);
+                border-style: solid;
+                transform: rotate(-1deg);
+            }
+
+            .link-custom i {
+                margin-right: 5px;
+            }
+
+        /* 内容面板样式 - 修改：确保居中 */
+        .content-panel {
+            width: 100%;
+            display: none;
+            text-align: center; /* 确保文本居中 */
         }
 
-        .link-custom i {
-            margin-right: 5px;
+            .content-panel.active {
+                display: flex;
+                justify-content: center; /* 水平居中 */
+            }
+
+        /* 面板标题样式 */
+        .panel-title {
+            font-size: 1.8rem;
+            color: var(--blue-black);
+            margin-bottom: 30px;
+            font-family: 'Calibri', sans-serif;
+        }
+
+        /* 面板内容样式 */
+        .panel-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
         }
 
         /* 模态框样式 */
@@ -292,22 +324,22 @@
             font-size: 1.2rem;
         }
 
-        .nav-btn:hover {
-            background: var(--accent-blue);
-            color: white;
-            transform: scale(1.1);
-        }
+            .nav-btn:hover {
+                background: var(--accent-blue);
+                color: white;
+                transform: scale(1.1);
+            }
 
-        .nav-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+            .nav-btn:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none;
+            }
 
-        .nav-btn:disabled:hover {
-            background: transparent;
-            color: var(--accent-blue);
-        }
+                .nav-btn:disabled:hover {
+                    background: transparent;
+                    color: var(--accent-blue);
+                }
 
         .chart-counter {
             font-size: 1.1rem;
@@ -362,16 +394,16 @@
             text-align: center;
         }
 
-        .btn-download:hover {
-            background: rgba(255, 250, 205, 0.8);
-            border-style: solid;
-            transform: rotate(-1deg) scale(1.02);
-            box-shadow: 0 5px 15px rgba(108, 108, 108, 0.2);
-        }
+            .btn-download:hover {
+                background: rgba(255, 250, 205, 0.8);
+                border-style: solid;
+                transform: rotate(-1deg) scale(1.02);
+                box-shadow: 0 5px 15px rgba(108, 108, 108, 0.2);
+            }
 
-        .btn-download:active {
-            transform: rotate(1deg) scale(0.98);
-        }
+            .btn-download:active {
+                transform: rotate(1deg) scale(0.98);
+            }
 
         /* 缩小弹窗尺寸的样式 */
         .modal-xl {
@@ -429,37 +461,37 @@
                 width: 100%;
                 order: 2;
             }
-            
+
             .main-container {
                 flex-direction: column;
             }
-            
+
             .header-title {
                 font-size: 1.8rem;
                 margin-left: 15px;
             }
-            
+
             .control-panel {
                 padding: 30px 15px;
             }
-            
+
             .link-group {
                 flex-direction: column;
                 gap: 20px;
                 align-items: center;
             }
-            
+
             .modal-footer {
                 flex-direction: column;
                 gap: 15px;
             }
-            
+
             .footer-left, .footer-center, .footer-right {
                 width: 100%;
                 justify-content: center;
                 order: unset;
             }
-            
+
             .chart-nav {
                 margin: 10px 0;
             }
@@ -469,29 +501,29 @@
                 max-width: 95%; /* 在移动设备上使用百分比 */
                 margin: 1rem auto;
             }
-            
+
             .modal-body {
                 max-height: 400px; /* 移动设备上进一步限制高度 */
             }
-            
+
             /* 修改：移动设备上保持图表宽高比 */
             #chartContainer {
                 height: 300px; /* 保持与电脑版相同的宽高比 */
                 position: relative;
             }
-            
+
             /* 确保图表在移动设备上保持比例 */
             #chartCanvas {
                 width: 100% !important;
                 height: 100% !important;
             }
-            
+
             /* 新增：移动设备上图表节点更小 */
             .mobile-chart-points {
                 pointRadius: 2 !important;
                 pointHoverRadius: 3 !important;
             }
-            
+
             /* 新增：移动设备上底部按钮布局 */
             .mobile-footer-buttons {
                 display: flex;
@@ -500,48 +532,99 @@
                 width: 100%;
                 margin-top: 10px;
             }
-            
-            .mobile-footer-buttons .btn-download {
-                flex: 1;
-                max-width: 140px;
-            }
+
+                .mobile-footer-buttons .btn-download {
+                    flex: 1;
+                    max-width: 140px;
+                }
         }
     </style>
+    <!-- 51la页面统计 -->
+    <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+    <script>LA.init({ id: "3NlvSR2kT1afN6AF", ck: "3NlvSR2kT1afN6AF" })</script>
 </head>
 <body>
     <!-- 顶部标题区域 -->
     <div class="header-section">
-        <h1 class="header-title">股票价值分析平台</h1>
+        <h1 class="header-title">A-SHARE.TOP</h1>
     </div>
 
     <!-- 主容器 -->
     <div class="main-container">
         <!-- 左侧导航栏 -->
         <nav class="sidebar">
-            <a href="#" class="nav-item active">
-                <i class="fas fa-chart-bar"></i>
-                市值&净利润折线图
+            <a class="nav-item active" data-panel="overview-panel">
+                <i class="fas fa-chart-line"></i>
+                个股概览
+            </a>
+            <a class="nav-item" data-panel="observation-log-panel">
+                <i class="fas fa-newspaper"></i>
+                观察日志
+            </a>
+            <a class="nav-item" data-panel="knowledge-research-panel">
+                <i class="fas fa-book"></i>
+                知识研究
+            </a>
+            <a class="nav-item" data-panel="about-panel">
+                <i class="fas fa-info-circle"></i>
+                关于网站
             </a>
         </nav>
 
         <!-- 主内容区 -->
         <main class="content-area">
-            <div class="control-panel">
-                <div class="form-group">
-                    <input type="text" class="form-control" id="stockCode" placeholder="请输入股票代码，例如：000001;000002;600000">
+            <!-- 个股概览面板 -->
+            <div class="content-panel active" id="overview-panel">
+                <div class="control-panel">
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="stockCode" placeholder="请输入股票代码，例如：000001;000002;600000">
+                    </div>
+
+                    <button class="btn-custom" id="confirmBtn">
+                        确认生成图表
+                    </button>
+
+                    <div class="link-group">
+                        <a href="#" class="link-custom" id="batchImportBtn">
+                            <i class="fas fa-upload"></i> 批量导入
+                        </a>
+                        <a href="#" class="link-custom" id="templateBtn">
+                            <i class="fas fa-download"></i> 模板下载
+                        </a>
+                    </div>
                 </div>
-                
-                <button class="btn-custom" id="confirmBtn">
-                    确认生成图表
-                </button>
-                
-                <div class="link-group">
-                    <a href="#" class="link-custom" id="batchImportBtn">
-                        <i class="fas fa-upload"></i> 批量导入
-                    </a>
-                    <a href="#" class="link-custom" id="templateBtn">
-                        <i class="fas fa-download"></i> 模板下载
-                    </a>
+            </div>
+
+            <!-- 观察日志面板 -->
+            <div class="content-panel" id="observation-log-panel">
+                <div class="control-panel">
+                    <h3 class="panel-title">观察日志</h3>
+                    <div class="panel-content">
+                        <p>这里是A股市场的观察日志，记录每日市场动态和投资观察。</p>
+                        <p>功能正在开发中，敬请期待...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 知识研究面板 -->
+            <div class="content-panel" id="knowledge-research-panel">
+                <div class="control-panel">
+                    <h3 class="panel-title">知识研究</h3>
+                    <div class="panel-content">
+                        <p>这里是A股投资知识研究区域，包含投资理论、分析方法等内容。</p>
+                        <p>功能正在开发中，敬请期待...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 关于网站面板 -->
+            <div class="content-panel" id="about-panel">
+                <div class="control-panel">
+                    <h3 class="panel-title">关于网站</h3>
+                    <div class="panel-content">
+                        <p>A-SHARE.TOP 是一个专注于A股市场分析的数据平台。</p>
+                        <p>我们提供股票价值分析、市场趋势观察等服务，帮助投资者做出更明智的投资决策。</p>
+                    </div>
                 </div>
             </div>
         </main>
@@ -590,7 +673,7 @@
                             <i class="fas fa-table"></i> 下载数据
                         </button>
                     </div>
-                    
+
                     <!-- 新增：移动设备上的按钮布局 -->
                     <div class="mobile-footer-buttons" style="display: none;">
                         <button type="button" class="btn-download" onclick="downloadCurrentChart()">
@@ -605,851 +688,875 @@
         </div>
     </div>
 
-     <!-- Bootstrap JS -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    // 全局变量存储图表数据
-    let stocksData = [];
-    let currentChartIndex = 0;
-    let chartModal = null;
-    let originalButtonText = '';
-    let currentChart = null;
+    <script>
+        // 全局变量存储图表数据
+        let stocksData = [];
+        let currentChartIndex = 0;
+        let chartModal = null;
+        let originalButtonText = '';
+        let currentChart = null;
 
-    // 获取CSRF token的辅助函数
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-
-    // 确认按钮点击事件
-    document.getElementById('confirmBtn').addEventListener('click', function() {
-        const stockCode = document.getElementById('stockCode').value.trim();
-        
-        // 保存原始按钮文本
-        originalButtonText = this.innerHTML;
-        
-        if (!stockCode) {
-            // 弹出确认对话框
-            if (confirm('文本框为空，是否随机查询10支股票？')) {
-                // 用户点击"是"，获取随机股票代码
-                getRandomStockCodes();
-            } else {
-                // 用户点击"否"，恢复按钮状态
-                restoreButtonState();
-            }
-            return;
-        }
-        
-        // 验证股票代码格式（可以是多个代码用分号分隔）
-        const codes = stockCode.split(';').map(code => code.trim()).filter(code => code);
-        for (let code of codes) {
-            if (code.length !== 6 || isNaN(code)) {
-                alert(`股票代码 "${code}" 必须是6位数字`);
-                restoreButtonState();
-                return;
-            }
-        }
-        
-        // 显示加载状态
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 获取数据中...';
-        this.disabled = true;
-        
-        // 调用获取数据函数
-        getStockData(stockCode);
-    });
-
-    // 获取随机股票代码
-    function getRandomStockCodes() {
-        const confirmBtn = document.getElementById('confirmBtn');
-        confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 获取随机股票中...';
-        confirmBtn.disabled = true;
-        
-        // 调用随机股票代码API
-        fetch('/api/get-random-stocks/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken') || ''
-            },
-            body: JSON.stringify({})
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                // 将随机股票代码填入文本框
-                document.getElementById('stockCode').value = data.stock_codes;
-                
-                // 使用随机股票代码获取数据
-                getStockData(data.stock_codes);
-            } else {
-                alert('获取随机股票代码失败: ' + data.error);
-                restoreButtonState();
-            }
-        })
-        .catch(error => {
-            console.error('获取随机股票代码失败:', error);
-            alert('获取随机股票代码失败: ' + error.message);
-            restoreButtonState();
-        });
-    }
-
-    // 获取股票数据函数
-    function getStockData(stockCode) {
-        // Ajax调用后端API
-        fetch('/api/get-stock-data/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken') || ''
-            },
-            body: JSON.stringify({
-                stock_number: stockCode
-            })
-        })
-        .then(response => {
-            // 首先检查响应类型
-            const contentType = response.headers.get('content-type');
-            
-            if (!contentType || !contentType.includes('application/json')) {
-                // 如果不是JSON响应，读取文本内容并显示
-                return response.text().then(htmlContent => {
-                    // 在新窗口中显示HTML内容
-                    displayHtmlResponse(htmlContent);
-                    throw new Error('服务器返回了HTML页面而不是JSON数据');
-                });
-            }
-            
-            if (!response.ok) {
-                return response.json().then(errorData => {
-                    throw new Error(errorData.error || `HTTP错误! 状态码: ${response.status}`);
-                });
-            }
-            
-            return response.json();
-        })
-        .then(data => {
-            // 恢复按钮状态
-            restoreButtonState();
-            
-            console.log('响应数据:', data);
-            
-            if (data.success) {
-                // 存储股票数据
-                stocksData = data.stocks_data || [];
-                currentChartIndex = 0;
-                
-                if (stocksData.length === 0) {
-                    alert('未获取到股票数据');
-                    return;
-                }
-                
-                // 显示图表模态框
-                showChart(currentChartIndex);
-                
-                // 初始化模态框
-                if (!chartModal) {
-                    chartModal = new bootstrap.Modal(document.getElementById('chartModal'));
-                    
-                    // 新增：监听模态框隐藏事件，清空文本框
-                    document.getElementById('chartModal').addEventListener('hidden.bs.modal', function() {
-                        document.getElementById('stockCode').value = '';
-                        // 销毁图表释放内存
-                        if (currentChart) {
-                            currentChart.destroy();
-                            currentChart = null;
-                        }
-                    });
-                }
-                chartModal.show();
-                
-            } else {
-                alert('错误: ' + (data.error || data.message || '未知错误'));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // 恢复按钮状态
-            restoreButtonState();
-            
-            // 错误信息已经在新窗口中显示，这里只显示简要提示
-            alert('请求失败，详细错误信息已在新窗口中显示');
-        });
-    }
-
-    // 恢复按钮状态
-    function restoreButtonState() {
-        const confirmBtn = document.getElementById('confirmBtn');
-        confirmBtn.innerHTML = originalButtonText;
-        confirmBtn.disabled = false;
-    }
-
-    // 显示指定索引的图表
-    function showChart(index) {
-        if (index < 0 || index >= stocksData.length) {
-            return;
-        }
-        
-        const stockData = stocksData[index];
-        
-        // 销毁之前的图表
-        if (currentChart) {
-            currentChart.destroy();
-        }
-        
-        // 创建新图表
-        const ctx = document.getElementById('chartCanvas').getContext('2d');
-        
-        // 检测是否为移动设备
-        const isMobile = window.innerWidth <= 768;
-        
-        // 准备数据 - 修复年份显示问题：将年份减1
-        const marketCapData = stockData.market_cap_data
-            .filter(item => item.market_capitalization > 0)
-            .map(item => {
-                const date = new Date(item.data_date);
-                // 年份减1
-                date.setFullYear(date.getFullYear() - 1);
-                return {
-                    x: date,
-                    y: item.market_capitalization
-                };
-            });
-        
-        const profitData = stockData.profit_data
-            .filter(item => item.net_profit_parent_quarterly !== null && item.net_profit_parent_quarterly !== 0)
-            .map(item => {
-                const date = new Date(item.data_date);
-                // 年份减1
-                date.setFullYear(date.getFullYear() - 1);
-                return {
-                    x: date,
-                    y: item.net_profit_parent_quarterly
-                };
-            });
-        
-        // 计算Y轴的单位
-        const marketCapValues = marketCapData.map(item => Math.abs(item.y));
-        const profitValues = profitData.map(item => Math.abs(item.y));
-        
-        const maxMarketCap = Math.max(...marketCapValues);
-        const maxProfit = Math.max(...profitValues);
-        
-        // 确定市值轴的单位
-        let marketCapUnit = '';
-        let marketCapDivisor = 1;
-        if (maxMarketCap >= 100000000) {
-            marketCapUnit = '亿';
-            marketCapDivisor = 100000000;
-        } else if (maxMarketCap >= 10000) {
-            marketCapUnit = '万';
-            marketCapDivisor = 10000;
-        }
-        
-        // 确定净利润轴的单位
-        let profitUnit = '';
-        let profitDivisor = 1;
-        if (maxProfit >= 100000000) {
-            profitUnit = '亿';
-            profitDivisor = 100000000;
-        } else if (maxProfit >= 10000) {
-            profitUnit = '万';
-            profitDivisor = 10000;
-        }
-        
-        // 格式化数值，去除末尾的0
-        function formatNumber(value, divisor) {
-            const num = value / divisor;
-            // 使用toFixed(2)然后去除末尾的0
-            return num.toFixed(2).replace(/\.?0+$/, '');
-        }
-        
-        // 根据设备类型设置节点大小
-        const pointRadius = isMobile ? 2 : 3;
-        const pointHoverRadius = isMobile ? 3 : 5;
-        
-        currentChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                datasets: [
-                    {
-                        label: '市值',
-                        data: marketCapData,
-                        borderColor: 'darkblue',
-                        backgroundColor: 'rgba(0, 0, 139, 0.1)',
-                        yAxisID: 'y',
-                        tension: 0.1,
-                        pointRadius: pointRadius, // 根据设备类型设置
-                        pointHoverRadius: pointHoverRadius, // 根据设备类型设置
-                        borderWidth: 2
-                    },
-                    {
-                        label: '净利润',
-                        data: profitData,
-                        borderColor: 'orange',
-                        backgroundColor: 'rgba(255, 165, 0, 0.1)',
-                        yAxisID: 'y1',
-                        tension: 0.1,
-                        pointRadius: pointRadius, // 根据设备类型设置
-                        pointHoverRadius: pointHoverRadius, // 根据设备类型设置
-                        borderWidth: 2
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'nearest',
-                    intersect: false,
-                },
-                plugins: {
-                    legend: {
-                        display: false // 隐藏图例
-                    },
-                    title: {
-                        display: true,
-                        text: `${stockData.stock_name}(${stockData.stock_code})市值与净利润趋势分析`,
-                        font: {
-                            size: isMobile ? 14 : 16 // 移动设备上标题字体小一点
-                        }
-                    },
-                    tooltip: {
-                        enabled: false // 禁用鼠标悬停提示
-                    }
-                },
-                scales: {
-                    x: {
-                        type: 'time',
-                        time: {
-                            unit: 'year', // 只显示整年
-                            displayFormats: {
-                                year: 'yyyy年'
-                            },
-                            tooltipFormat: 'yyyy年MM月'
-                        },
-                        title: {
-                            display: true,
-                            text: '日期',
-                            font: {
-                                size: isMobile ? 12 : 14 // 移动设备上字体小一点
-                            }
-                        },
-                        grid: {
-                            color: function(context) {
-                                // 季度线 - 更淡的浅灰色细线
-                                if (context.tick && context.tick.major) {
-                                    return 'rgba(220, 220, 220, 0.2)';
-                                }
-                                // 年线 - 更淡的深灰色粗线
-                                return 'rgba(150, 150, 150, 0.3)';
-                            },
-                            lineWidth: function(context) {
-                                // 季度线更细，年线更细
-                                if (context.tick && context.tick.major) {
-                                    return 0.5;
-                                }
-                                return 1;
-                            }
-                        },
-                        ticks: {
-                            // 只显示整年刻度
-                            source: 'auto',
-                            autoSkip: true,
-                            maxTicksLimit: isMobile ? 6 : 10, // 移动设备上显示更少的刻度
-                            font: {
-                                size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
-                            }
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        title: {
-                            display: true,
-                            text: '市值',
-                            color: 'darkblue', // 蓝色标题
-                            font: {
-                                weight: 'bold',
-                                size: isMobile ? 12 : 14 // 移动设备上字体小一点
-                            }
-                        },
-                        ticks: {
-                            color: 'darkblue', // 蓝色刻度
-                            callback: function(value) {
-                                if (marketCapDivisor > 1) {
-                                    return formatNumber(value, marketCapDivisor) + marketCapUnit;
-                                }
-                                return value.toLocaleString();
-                            },
-                            font: {
-                                size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
-                            }
-                        },
-                        // 修复纵向背景线样式，与横向保持一致
-                        grid: {
-                            color: function(context) {
-                                // 季度线 - 更淡的浅灰色细线
-                                if (context.tick && context.tick.major) {
-                                    return 'rgba(220, 220, 220, 0.2)';
-                                }
-                                // 年线 - 更淡的深灰色粗线
-                                return 'rgba(150, 150, 150, 0.3)';
-                            },
-                            lineWidth: function(context) {
-                                // 季度线更细，年线更细
-                                if (context.tick && context.tick.major) {
-                                    return 0.5;
-                                }
-                                return 1;
-                            }
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        title: {
-                            display: true,
-                            text: '净利润',
-                            color: 'orange', // 橘黄色标题
-                            font: {
-                                weight: 'bold',
-                                size: isMobile ? 12 : 14 // 移动设备上字体小一点
-                            }
-                        },
-                        ticks: {
-                            color: 'orange', // 橘黄色刻度
-                            callback: function(value) {
-                                if (profitDivisor > 1) {
-                                    return formatNumber(value, profitDivisor) + profitUnit;
-                                }
-                                return value.toLocaleString();
-                            },
-                            font: {
-                                size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
-                            }
-                        },
-                        // 右侧Y轴不显示背景线
-                        grid: {
-                            drawOnChartArea: false,
-                        },
-                    }
-                }
-            }
-        });
-        
-        // 更新标题和计数器
-        document.getElementById('chartModalLabel').textContent = 
-            `${stockData.stock_name}(${stockData.stock_code}) - 市值与净利润趋势分析`;
-        
-        document.getElementById('currentChart').textContent = index + 1;
-        document.getElementById('totalCharts').textContent = stocksData.length;
-        
-        document.getElementById('prevChart').disabled = index === 0;
-        document.getElementById('nextChart').disabled = index === stocksData.length - 1;
-        
-        // 根据设备类型调整按钮布局
-        adjustFooterLayout(isMobile);
-        
-        currentChartIndex = index;
-    }
-
-    // 根据设备类型调整底部按钮布局
-    function adjustFooterLayout(isMobile) {
-        const desktopFooterLeft = document.querySelector('.footer-left');
-        const desktopFooterRight = document.querySelector('.footer-right');
-        const mobileFooterButtons = document.querySelector('.mobile-footer-buttons');
-        
-        if (isMobile) {
-            // 移动设备：隐藏桌面版按钮，显示移动版按钮
-            desktopFooterLeft.style.display = 'none';
-            desktopFooterRight.style.display = 'none';
-            mobileFooterButtons.style.display = 'flex';
-        } else {
-            // 桌面设备：显示桌面版按钮，隐藏移动版按钮
-            desktopFooterLeft.style.display = 'flex';
-            desktopFooterRight.style.display = 'flex';
-            mobileFooterButtons.style.display = 'none';
-        }
-    }
-
-    // 上一个图表
-    document.getElementById('prevChart').addEventListener('click', function() {
-        if (currentChartIndex > 0) {
-            showChart(currentChartIndex - 1);
-        }
-    });
-
-    // 下一个图表
-    document.getElementById('nextChart').addEventListener('click', function() {
-        if (currentChartIndex < stocksData.length - 1) {
-            showChart(currentChartIndex + 1);
-        }
-    });
-
-    // 键盘事件监听
-    document.addEventListener('keydown', function(e) {
-        const modal = document.getElementById('chartModal');
-        if (modal && modal.classList.contains('show')) {
-            switch(e.key) {
-                case 'ArrowLeft':
-                    if (currentChartIndex > 0) {
-                        showChart(currentChartIndex - 1);
-                        e.preventDefault();
-                    }
-                    break;
-                case 'ArrowRight':
-                    if (currentChartIndex < stocksData.length - 1) {
-                        showChart(currentChartIndex + 1);
-                        e.preventDefault();
-                    }
-                    break;
-                case 'Escape':
-                    // ESC键关闭模态框
-                    if (chartModal) {
-                        chartModal.hide();
-                    }
-                    break;
-            }
-        }
-    });
-
-    // 模板下载链接点击事件
-    document.getElementById('templateBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        
-        // 显示下载中状态
-        const originalHtml = this.innerHTML;
-        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 下载中...';
-        this.disabled = true;
-
-        // 发送下载请求
-        fetch('/api/download-template/', {
-            method: 'GET',
-            headers: {
-                'X-CSRFToken': getCookie('csrftoken') || ''
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP错误! 状态码: ${response.status}`);
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            // 创建下载链接
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = 'template.xlsx'; // 设置下载文件名
-            
-            // 触发下载
-            document.body.appendChild(a);
-            a.click();
-            
-            // 清理
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
-            
-            // 恢复按钮状态
-            this.innerHTML = originalHtml;
-            this.disabled = false;
-            
-            alert('模板下载成功！');
-        })
-        .catch(error => {
-            console.error('下载失败:', error);
-            alert('下载失败: ' + error.message);
-            
-            // 恢复按钮状态
-            this.innerHTML = originalHtml;
-            this.disabled = false;
-        });
-    });
-
-    // 批量导入链接点击事件
-    document.getElementById('batchImportBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        // 触发隐藏的文件输入框点击
-        document.getElementById('fileInput').click();
-    });
-
-    // 文件选择变化事件
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        
-        // 检查文件类型
-        if (!file.name.endsWith('.xlsx')) {
-            alert('请选择Excel文件 (.xlsx)');
-            this.value = ''; // 清空选择
-            return;
-        }
-        
-        // 显示加载状态
-        const batchBtn = document.getElementById('batchImportBtn');
-        const originalHtml = batchBtn.innerHTML;
-        batchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 读取中...';
-        batchBtn.style.pointerEvents = 'none';
-        
-        readExcelFile(file, batchBtn, originalHtml);
-    });
-
-    // 读取Excel文件的函数
-    function readExcelFile(file, batchBtn, originalHtml) {
-        const reader = new FileReader();
-        
-        reader.onload = function(e) {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
-                // 获取第一个工作表
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                
-                console.log('Excel数据:', jsonData);
-                
-                if (jsonData.length === 0) {
-                    throw new Error('Excel文件中没有数据');
-                }
-                
-                // 提取上市公司代码
-                const stockCodes = [];
-                const columnNames = Object.keys(jsonData[0] || {});
-                console.log('列名:', columnNames);
-                
-                // 尝试查找包含"代码"的列名
-                let codeColumn = null;
-                for (let col of columnNames) {
-                    if (col.includes('代码') || col.includes('stock') || col.includes('code') || col.toLowerCase().includes('code')) {
-                        codeColumn = col;
+        // 获取CSRF token的辅助函数
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                         break;
                     }
                 }
-                
-                // 如果没有找到特定列名，使用第一列
-                if (!codeColumn && columnNames.length > 0) {
-                    codeColumn = columnNames[0];
-                }
-                
-                if (!codeColumn) {
-                    throw new Error('未找到数据列');
-                }
-                
-                jsonData.forEach(row => {
-                    if (row[codeColumn]) {
-                        const code = String(row[codeColumn]).replace(/\s/g, '');
-                        if (code.length >= 6) {
-                            const sixDigitCode = code.substring(0, 6);
-                            if (!isNaN(sixDigitCode) && sixDigitCode.length === 6) {
-                                stockCodes.push(sixDigitCode);
-                            }
-                        }
-                    }
+            }
+            return cookieValue;
+        }
+
+        // 导航栏切换功能
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function () {
+                // 移除所有导航项的active类
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
                 });
-                
-                if (stockCodes.length === 0) {
-                    alert('未找到有效的6位数字股票代码，请检查文件格式');
+
+                // 为当前点击的导航项添加active类
+                this.classList.add('active');
+
+                // 获取要显示的面板ID
+                const panelId = this.getAttribute('data-panel');
+
+                // 隐藏所有内容面板
+                document.querySelectorAll('.content-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+
+                // 显示选中的内容面板
+                document.getElementById(panelId).classList.add('active');
+            });
+        });
+
+        // 确认按钮点击事件
+        document.getElementById('confirmBtn').addEventListener('click', function () {
+            const stockCode = document.getElementById('stockCode').value.trim();
+
+            // 保存原始按钮文本
+            originalButtonText = this.innerHTML;
+
+            if (!stockCode) {
+                // 弹出确认对话框
+                if (confirm('文本框为空，是否随机查询10支股票？')) {
+                    // 用户点击"是"，获取随机股票代码
+                    getRandomStockCodes();
+                } else {
+                    // 用户点击"否"，恢复按钮状态
+                    restoreButtonState();
+                }
+                return;
+            }
+
+            // 验证股票代码格式（可以是多个代码用分号分隔）
+            const codes = stockCode.split(';').map(code => code.trim()).filter(code => code);
+            for (let code of codes) {
+                if (code.length !== 6 || isNaN(code)) {
+                    alert(`股票代码 "${code}" 必须是6位数字`);
+                    restoreButtonState();
                     return;
                 }
-                
-                // 去重并赋值给文本框
-                const uniqueCodes = [...new Set(stockCodes)];
-                document.getElementById('stockCode').value = uniqueCodes.join(';');
-                
-                alert(`成功导入 ${uniqueCodes.length} 个股票代码`);
-                
-            } catch (error) {
-                console.error('读取Excel文件失败:', error);
-                alert('读取Excel文件失败: ' + error.message + '\n请确保文件格式正确，包含"上市公司代码"列');
-            } finally {
-                // 恢复按钮状态
+            }
+
+            // 显示加载状态
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 获取数据中...';
+            this.disabled = true;
+
+            // 调用获取数据函数
+            getStockData(stockCode);
+        });
+
+        // 获取随机股票代码
+        function getRandomStockCodes() {
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 获取随机股票中...';
+            confirmBtn.disabled = true;
+
+            // 调用随机股票代码API
+            fetch('/api/get-random-stocks/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                },
+                body: JSON.stringify({})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // 将随机股票代码填入文本框
+                        document.getElementById('stockCode').value = data.stock_codes;
+
+                        // 使用随机股票代码获取数据
+                        getStockData(data.stock_codes);
+                    } else {
+                        alert('获取随机股票代码失败: ' + data.error);
+                        restoreButtonState();
+                    }
+                })
+                .catch(error => {
+                    console.error('获取随机股票代码失败:', error);
+                    alert('获取随机股票代码失败: ' + error.message);
+                    restoreButtonState();
+                });
+        }
+
+        // 获取股票数据函数
+        function getStockData(stockCode) {
+            // Ajax调用后端API
+            fetch('/api/get-stock-data/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                },
+                body: JSON.stringify({
+                    stock_number: stockCode
+                })
+            })
+                .then(response => {
+                    // 首先检查响应类型
+                    const contentType = response.headers.get('content-type');
+
+                    if (!contentType || !contentType.includes('application/json')) {
+                        // 如果不是JSON响应，读取文本内容并显示
+                        return response.text().then(htmlContent => {
+                            // 在新窗口中显示HTML内容
+                            displayHtmlResponse(htmlContent);
+                            throw new Error('服务器返回了HTML页面而不是JSON数据');
+                        });
+                    }
+
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw new Error(errorData.error || `HTTP错误! 状态码: ${response.status}`);
+                        });
+                    }
+
+                    return response.json();
+                })
+                .then(data => {
+                    // 恢复按钮状态
+                    restoreButtonState();
+
+                    console.log('响应数据:', data);
+
+                    if (data.success) {
+                        // 存储股票数据
+                        stocksData = data.stocks_data || [];
+                        currentChartIndex = 0;
+
+                        if (stocksData.length === 0) {
+                            alert('未获取到股票数据');
+                            return;
+                        }
+
+                        // 显示图表模态框
+                        showChart(currentChartIndex);
+
+                        // 初始化模态框
+                        if (!chartModal) {
+                            chartModal = new bootstrap.Modal(document.getElementById('chartModal'));
+
+                            // 新增：监听模态框隐藏事件，清空文本框
+                            document.getElementById('chartModal').addEventListener('hidden.bs.modal', function () {
+                                document.getElementById('stockCode').value = '';
+                                // 销毁图表释放内存
+                                if (currentChart) {
+                                    currentChart.destroy();
+                                    currentChart = null;
+                                }
+                            });
+                        }
+                        chartModal.show();
+
+                    } else {
+                        alert('错误: ' + (data.error || data.message || '未知错误'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // 恢复按钮状态
+                    restoreButtonState();
+
+                    // 错误信息已经在新窗口中显示，这里只显示简要提示
+                    alert('请求失败，详细错误信息已在新窗口中显示');
+                });
+        }
+
+        // 恢复按钮状态
+        function restoreButtonState() {
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.innerHTML = originalButtonText;
+            confirmBtn.disabled = false;
+        }
+
+        // 显示指定索引的图表
+        function showChart(index) {
+            if (index < 0 || index >= stocksData.length) {
+                return;
+            }
+
+            const stockData = stocksData[index];
+
+            // 销毁之前的图表
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            // 创建新图表
+            const ctx = document.getElementById('chartCanvas').getContext('2d');
+
+            // 检测是否为移动设备
+            const isMobile = window.innerWidth <= 768;
+
+            // 准备数据 - 修复年份显示问题：将年份减1
+            const marketCapData = stockData.market_cap_data
+                .filter(item => item.market_capitalization > 0)
+                .map(item => {
+                    const date = new Date(item.data_date);
+                    // 年份减1
+                    date.setFullYear(date.getFullYear() - 1);
+                    return {
+                        x: date,
+                        y: item.market_capitalization
+                    };
+                });
+
+            const profitData = stockData.profit_data
+                .filter(item => item.net_profit_parent_quarterly !== null && item.net_profit_parent_quarterly !== 0)
+                .map(item => {
+                    const date = new Date(item.data_date);
+                    // 年份减1
+                    date.setFullYear(date.getFullYear() - 1);
+                    return {
+                        x: date,
+                        y: item.net_profit_parent_quarterly
+                    };
+                });
+
+            // 计算Y轴的单位
+            const marketCapValues = marketCapData.map(item => Math.abs(item.y));
+            const profitValues = profitData.map(item => Math.abs(item.y));
+
+            const maxMarketCap = Math.max(...marketCapValues);
+            const maxProfit = Math.max(...profitValues);
+
+            // 确定市值轴的单位
+            let marketCapUnit = '';
+            let marketCapDivisor = 1;
+            if (maxMarketCap >= 100000000) {
+                marketCapUnit = '亿';
+                marketCapDivisor = 100000000;
+            } else if (maxMarketCap >= 10000) {
+                marketCapUnit = '万';
+                marketCapDivisor = 10000;
+            }
+
+            // 确定净利润轴的单位
+            let profitUnit = '';
+            let profitDivisor = 1;
+            if (maxProfit >= 100000000) {
+                profitUnit = '亿';
+                profitDivisor = 100000000;
+            } else if (maxProfit >= 10000) {
+                profitUnit = '万';
+                profitDivisor = 10000;
+            }
+
+            // 格式化数值，去除末尾的0
+            function formatNumber(value, divisor) {
+                const num = value / divisor;
+                // 使用toFixed(2)然后去除末尾的0
+                return num.toFixed(2).replace(/\.?0+$/, '');
+            }
+
+            // 根据设备类型设置节点大小
+            const pointRadius = isMobile ? 2 : 3;
+            const pointHoverRadius = isMobile ? 3 : 5;
+
+            currentChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    datasets: [
+                        {
+                            label: '市值',
+                            data: marketCapData,
+                            borderColor: 'darkblue',
+                            backgroundColor: 'rgba(0, 0, 139, 0.1)',
+                            yAxisID: 'y',
+                            tension: 0.1,
+                            pointRadius: pointRadius, // 根据设备类型设置
+                            pointHoverRadius: pointHoverRadius, // 根据设备类型设置
+                            borderWidth: 2
+                        },
+                        {
+                            label: '净利润',
+                            data: profitData,
+                            borderColor: 'orange',
+                            backgroundColor: 'rgba(255, 165, 0, 0.1)',
+                            yAxisID: 'y1',
+                            tension: 0.1,
+                            pointRadius: pointRadius, // 根据设备类型设置
+                            pointHoverRadius: pointHoverRadius, // 根据设备类型设置
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'nearest',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: {
+                            display: false // 隐藏图例
+                        },
+                        title: {
+                            display: true,
+                            text: `${stockData.stock_name}(${stockData.stock_code})市值与净利润趋势分析`,
+                            font: {
+                                size: isMobile ? 14 : 16 // 移动设备上标题字体小一点
+                            }
+                        },
+                        tooltip: {
+                            enabled: false // 禁用鼠标悬停提示
+                        }
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'year', // 只显示整年
+                                displayFormats: {
+                                    year: 'yyyy年'
+                                },
+                                tooltipFormat: 'yyyy年MM月'
+                            },
+                            title: {
+                                display: true,
+                                text: '日期',
+                                font: {
+                                    size: isMobile ? 12 : 14 // 移动设备上字体小一点
+                                }
+                            },
+                            grid: {
+                                color: function (context) {
+                                    // 季度线 - 更淡的浅灰色细线
+                                    if (context.tick && context.tick.major) {
+                                        return 'rgba(220, 220, 220, 0.2)';
+                                    }
+                                    // 年线 - 更淡的深灰色粗线
+                                    return 'rgba(150, 150, 150, 0.3)';
+                                },
+                                lineWidth: function (context) {
+                                    // 季度线更细，年线更细
+                                    if (context.tick && context.tick.major) {
+                                        return 0.5;
+                                    }
+                                    return 1;
+                                }
+                            },
+                            ticks: {
+                                // 只显示整年刻度
+                                source: 'auto',
+                                autoSkip: true,
+                                maxTicksLimit: isMobile ? 6 : 10, // 移动设备上显示更少的刻度
+                                font: {
+                                    size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
+                                }
+                            }
+                        },
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: '市值',
+                                color: 'darkblue', // 蓝色标题
+                                font: {
+                                    weight: 'bold',
+                                    size: isMobile ? 12 : 14 // 移动设备上字体小一点
+                                }
+                            },
+                            ticks: {
+                                color: 'darkblue', // 蓝色刻度
+                                callback: function (value) {
+                                    if (marketCapDivisor > 1) {
+                                        return formatNumber(value, marketCapDivisor) + marketCapUnit;
+                                    }
+                                    return value.toLocaleString();
+                                },
+                                font: {
+                                    size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
+                                }
+                            },
+                            // 修复纵向背景线样式，与横向保持一致
+                            grid: {
+                                color: function (context) {
+                                    // 季度线 - 更淡的浅灰色细线
+                                    if (context.tick && context.tick.major) {
+                                        return 'rgba(220, 220, 220, 0.2)';
+                                    }
+                                    // 年线 - 更淡的深灰色粗线
+                                    return 'rgba(150, 150, 150, 0.3)';
+                                },
+                                lineWidth: function (context) {
+                                    // 季度线更细，年线更细
+                                    if (context.tick && context.tick.major) {
+                                        return 0.5;
+                                    }
+                                    return 1;
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: '净利润',
+                                color: 'orange', // 橘黄色标题
+                                font: {
+                                    weight: 'bold',
+                                    size: isMobile ? 12 : 14 // 移动设备上字体小一点
+                                }
+                            },
+                            ticks: {
+                                color: 'orange', // 橘黄色刻度
+                                callback: function (value) {
+                                    if (profitDivisor > 1) {
+                                        return formatNumber(value, profitDivisor) + profitUnit;
+                                    }
+                                    return value.toLocaleString();
+                                },
+                                font: {
+                                    size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
+                                }
+                            },
+                            // 右侧Y轴不显示背景线
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                        }
+                    }
+                }
+            });
+
+            // 更新标题和计数器
+            document.getElementById('chartModalLabel').textContent =
+                `${stockData.stock_name}(${stockData.stock_code}) - 市值与净利润趋势分析`;
+
+            document.getElementById('currentChart').textContent = index + 1;
+            document.getElementById('totalCharts').textContent = stocksData.length;
+
+            document.getElementById('prevChart').disabled = index === 0;
+            document.getElementById('nextChart').disabled = index === stocksData.length - 1;
+
+            // 根据设备类型调整按钮布局
+            adjustFooterLayout(isMobile);
+
+            currentChartIndex = index;
+        }
+
+        // 根据设备类型调整底部按钮布局
+        function adjustFooterLayout(isMobile) {
+            const desktopFooterLeft = document.querySelector('.footer-left');
+            const desktopFooterRight = document.querySelector('.footer-right');
+            const mobileFooterButtons = document.querySelector('.mobile-footer-buttons');
+
+            if (isMobile) {
+                // 移动设备：隐藏桌面版按钮，显示移动版按钮
+                desktopFooterLeft.style.display = 'none';
+                desktopFooterRight.style.display = 'none';
+                mobileFooterButtons.style.display = 'flex';
+            } else {
+                // 桌面设备：显示桌面版按钮，隐藏移动版按钮
+                desktopFooterLeft.style.display = 'flex';
+                desktopFooterRight.style.display = 'flex';
+                mobileFooterButtons.style.display = 'none';
+            }
+        }
+
+        // 上一个图表
+        document.getElementById('prevChart').addEventListener('click', function () {
+            if (currentChartIndex > 0) {
+                showChart(currentChartIndex - 1);
+            }
+        });
+
+        // 下一个图表
+        document.getElementById('nextChart').addEventListener('click', function () {
+            if (currentChartIndex < stocksData.length - 1) {
+                showChart(currentChartIndex + 1);
+            }
+        });
+
+        // 键盘事件监听
+        document.addEventListener('keydown', function (e) {
+            const modal = document.getElementById('chartModal');
+            if (modal && modal.classList.contains('show')) {
+                switch (e.key) {
+                    case 'ArrowLeft':
+                        if (currentChartIndex > 0) {
+                            showChart(currentChartIndex - 1);
+                            e.preventDefault();
+                        }
+                        break;
+                    case 'ArrowRight':
+                        if (currentChartIndex < stocksData.length - 1) {
+                            showChart(currentChartIndex + 1);
+                            e.preventDefault();
+                        }
+                        break;
+                    case 'Escape':
+                        // ESC键关闭模态框
+                        if (chartModal) {
+                            chartModal.hide();
+                        }
+                        break;
+                }
+            }
+        });
+
+        // 模板下载链接点击事件
+        document.getElementById('templateBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+
+            // 显示下载中状态
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 下载中...';
+            this.disabled = true;
+
+            // 发送下载请求
+            fetch('/api/download-template/', {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') || ''
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP错误! 状态码: ${response.status}`);
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // 创建下载链接
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'template.xlsx'; // 设置下载文件名
+
+                    // 触发下载
+                    document.body.appendChild(a);
+                    a.click();
+
+                    // 清理
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+
+                    // 恢复按钮状态
+                    this.innerHTML = originalHtml;
+                    this.disabled = false;
+
+                    alert('模板下载成功！');
+                })
+                .catch(error => {
+                    console.error('下载失败:', error);
+                    alert('下载失败: ' + error.message);
+
+                    // 恢复按钮状态
+                    this.innerHTML = originalHtml;
+                    this.disabled = false;
+                });
+        });
+
+        // 批量导入链接点击事件
+        document.getElementById('batchImportBtn').addEventListener('click', function (e) {
+            e.preventDefault();
+            // 触发隐藏的文件输入框点击
+            document.getElementById('fileInput').click();
+        });
+
+        // 文件选择变化事件
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // 检查文件类型
+            if (!file.name.endsWith('.xlsx')) {
+                alert('请选择Excel文件 (.xlsx)');
+                this.value = ''; // 清空选择
+                return;
+            }
+
+            // 显示加载状态
+            const batchBtn = document.getElementById('batchImportBtn');
+            const originalHtml = batchBtn.innerHTML;
+            batchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 读取中...';
+            batchBtn.style.pointerEvents = 'none';
+
+            readExcelFile(file, batchBtn, originalHtml);
+        });
+
+        // 读取Excel文件的函数
+        function readExcelFile(file, batchBtn, originalHtml) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+
+                    // 获取第一个工作表
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+                    console.log('Excel数据:', jsonData);
+
+                    if (jsonData.length === 0) {
+                        throw new Error('Excel文件中没有数据');
+                    }
+
+                    // 提取上市公司代码
+                    const stockCodes = [];
+                    const columnNames = Object.keys(jsonData[0] || {});
+                    console.log('列名:', columnNames);
+
+                    // 尝试查找包含"代码"的列名
+                    let codeColumn = null;
+                    for (let col of columnNames) {
+                        if (col.includes('代码') || col.includes('stock') || col.includes('code') || col.toLowerCase().includes('code')) {
+                            codeColumn = col;
+                            break;
+                        }
+                    }
+
+                    // 如果没有找到特定列名，使用第一列
+                    if (!codeColumn && columnNames.length > 0) {
+                        codeColumn = columnNames[0];
+                    }
+
+                    if (!codeColumn) {
+                        throw new Error('未找到数据列');
+                    }
+
+                    jsonData.forEach(row => {
+                        if (row[codeColumn]) {
+                            const code = String(row[codeColumn]).replace(/\s/g, '');
+                            if (code.length >= 6) {
+                                const sixDigitCode = code.substring(0, 6);
+                                if (!isNaN(sixDigitCode) && sixDigitCode.length === 6) {
+                                    stockCodes.push(sixDigitCode);
+                                }
+                            }
+                        }
+                    });
+
+                    if (stockCodes.length === 0) {
+                        alert('未找到有效的6位数字股票代码，请检查文件格式');
+                        return;
+                    }
+
+                    // 去重并赋值给文本框
+                    const uniqueCodes = [...new Set(stockCodes)];
+                    document.getElementById('stockCode').value = uniqueCodes.join(';');
+
+                    alert(`成功导入 ${uniqueCodes.length} 个股票代码`);
+
+                } catch (error) {
+                    console.error('读取Excel文件失败:', error);
+                    alert('读取Excel文件失败: ' + error.message + '\n请确保文件格式正确，包含"上市公司代码"列');
+                } finally {
+                    // 恢复按钮状态
+                    batchBtn.innerHTML = originalHtml;
+                    batchBtn.style.pointerEvents = 'auto';
+                    document.getElementById('fileInput').value = '';
+                }
+            };
+
+            reader.onerror = function () {
+                alert('文件读取失败，请重试');
                 batchBtn.innerHTML = originalHtml;
                 batchBtn.style.pointerEvents = 'auto';
                 document.getElementById('fileInput').value = '';
-            }
-        };
-        
-        reader.onerror = function() {
-            alert('文件读取失败，请重试');
-            batchBtn.innerHTML = originalHtml;
-            batchBtn.style.pointerEvents = 'auto';
-            document.getElementById('fileInput').value = '';
-        };
-        
-        reader.readAsArrayBuffer(file);
-    }
+            };
 
-    // 显示HTML响应的函数
-    function displayHtmlResponse(htmlContent) {
-        // 创建一个新窗口显示HTML内容
-        const newWindow = window.open('', '_blank');
-        newWindow.document.write(`
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>服务器响应详情</title>
-                <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-                    .container { background: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-                    h1 { color: #d32f2f; }
-                    pre { background: #f8f8f8; padding: 15px; border-left: 4px solid #d32f2f; overflow: auto; }
-                    .info { background: #e3f2fd; padding: 10px; border-radius: 3px; margin-bottom: 15px; }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>服务器返回了HTML响应</h1>
-                    <div class="info">
-                        <p>这通常意味着：</p>
-                        <ul>
-                            <li>Django视图函数没有返回JsonResponse</li>
-                            <li>URL配置不正确</li>
-                            <li>服务器发生了未处理的异常</li>
-                            <li>认证或权限问题</li>
-                        </ul>
-                    </div>
-                    <h2>响应内容：</h2>
-                    <pre>${escapeHtml(htmlContent)}</pre>
-                    <button onclick="window.close()">关闭窗口</button>
-                </div>
-            </body>
-            </html>
-        `);
-    }
-
-    // HTML转义函数
-    function escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
-
-    // 下载当前图表功能
-    function downloadCurrentChart() {
-        if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
-            alert('没有可下载的图表');
-            return;
+            reader.readAsArrayBuffer(file);
         }
-        
-        if (currentChart) {
-            const link = document.createElement('a');
+
+        // 显示HTML响应的函数
+        function displayHtmlResponse(htmlContent) {
+            // 创建一个新窗口显示HTML内容
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>服务器响应详情</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+                            .container { background: white; padding: 20px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+                            h1 { color: #d32f2f; }
+                            pre { background: #f8f8f8; padding: 15px; border-left: 4px solid #d32f2f; overflow: auto; }
+                            .info { background: #e3f2fd; padding: 10px; border-radius: 3px; margin-bottom: 15px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>服务器返回了HTML响应</h1>
+                            <div class="info">
+                                <p>这通常意味着：</p>
+                                <ul>
+                                    <li>Django视图函数没有返回JsonResponse</li>
+                                    <li>URL配置不正确</li>
+                                    <li>服务器发生了未处理的异常</li>
+                                    <li>认证或权限问题</li>
+                                </ul>
+                            </div>
+                            <h2>响应内容：</h2>
+                            <pre>${escapeHtml(htmlContent)}</pre>
+                            <button onclick="window.close()">关闭窗口</button>
+                        </div>
+                    </body>
+                    </html>
+                `);
+        }
+
+        // HTML转义函数
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        // 下载当前图表功能
+        function downloadCurrentChart() {
+            if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
+                alert('没有可下载的图表');
+                return;
+            }
+
+            if (currentChart) {
+                const link = document.createElement('a');
+                const stockData = stocksData[currentChartIndex];
+
+                // 获取当前日期，格式为 yyyymmdd
+                const today = new Date();
+                const year = today.getFullYear();
+                const month = String(today.getMonth() + 1).padStart(2, '0');
+                const day = String(today.getDate()).padStart(2, '0');
+                const dateString = `${year}${month}${day}`;
+
+                link.download = `${stockData.stock_name}(${stockData.stock_code})_${dateString}.png`;
+                link.href = currentChart.toBase64Image();
+                link.click();
+            }
+        }
+
+        // 下载当前数据功能
+        function downloadCurrentData() {
+            if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
+                alert('没有可下载的数据');
+                return;
+            }
+
             const stockData = stocksData[currentChartIndex];
-            
-            // 获取当前日期，格式为 yyyymmdd
+
+            // 准备数据表格
+            const marketCapData = stockData.market_cap_data || [];
+            const profitData = stockData.profit_data || [];
+
+            // 合并数据 - 以日期为键
+            const dataMap = {};
+
+            // 处理市值数据
+            marketCapData.forEach(item => {
+                const date = new Date(item.data_date);
+                // 年份减1
+                date.setFullYear(date.getFullYear() - 1);
+                const dateStr = date.toISOString().split('T')[0];
+
+                if (!dataMap[dateStr]) {
+                    dataMap[dateStr] = { 日期: dateStr };
+                }
+                dataMap[dateStr]['市值'] = item.market_capitalization;
+            });
+
+            // 处理净利润数据
+            profitData.forEach(item => {
+                const date = new Date(item.data_date);
+                // 年份减1
+                date.setFullYear(date.getFullYear() - 1);
+                const dateStr = date.toISOString().split('T')[0];
+
+                if (!dataMap[dateStr]) {
+                    dataMap[dateStr] = { 日期: dateStr };
+                }
+                dataMap[dateStr]['净利润'] = item.net_profit_parent_quarterly;
+            });
+
+            // 转换为数组
+            const dataArray = Object.values(dataMap);
+
+            // 按日期排序
+            dataArray.sort((a, b) => new Date(a.日期) - new Date(b.日期));
+
+            if (dataArray.length === 0) {
+                alert('没有可导出的数据');
+                return;
+            }
+
+            // 创建工作簿
+            const wb = XLSX.utils.book_new();
+
+            // 创建工作表
+            const ws = XLSX.utils.json_to_sheet(dataArray);
+
+            // 将工作表添加到工作簿
+            XLSX.utils.book_append_sheet(wb, ws, '股票数据');
+
+            // 生成Excel文件并下载
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
             const dateString = `${year}${month}${day}`;
-            
-            link.download = `${stockData.stock_name}(${stockData.stock_code})_${dateString}.png`;
-            link.href = currentChart.toBase64Image();
-            link.click();
-        }
-    }
 
-    // 下载当前数据功能
-    function downloadCurrentData() {
-        if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
-            alert('没有可下载的数据');
-            return;
+            // 修复中文列名乱码问题 - 使用UTF-8编码
+            XLSX.writeFile(wb, `${stockData.stock_name}(${stockData.stock_code})_${dateString}.xlsx`, {
+                bookType: 'xlsx',
+                type: 'binary',
+                cellStyles: true
+            });
         }
-        
-        const stockData = stocksData[currentChartIndex];
-        
-        // 准备数据表格
-        const marketCapData = stockData.market_cap_data || [];
-        const profitData = stockData.profit_data || [];
-        
-        // 合并数据 - 以日期为键
-        const dataMap = {};
-        
-        // 处理市值数据
-        marketCapData.forEach(item => {
-            const date = new Date(item.data_date);
-            // 年份减1
-            date.setFullYear(date.getFullYear() - 1);
-            const dateStr = date.toISOString().split('T')[0];
-            
-            if (!dataMap[dateStr]) {
-                dataMap[dateStr] = { 日期: dateStr };
-            }
-            dataMap[dateStr]['市值'] = item.market_capitalization;
-        });
-        
-        // 处理净利润数据
-        profitData.forEach(item => {
-            const date = new Date(item.data_date);
-            // 年份减1
-            date.setFullYear(date.getFullYear() - 1);
-            const dateStr = date.toISOString().split('T')[0];
-            
-            if (!dataMap[dateStr]) {
-                dataMap[dateStr] = { 日期: dateStr };
-            }
-            dataMap[dateStr]['净利润'] = item.net_profit_parent_quarterly;
-        });
-        
-        // 转换为数组
-        const dataArray = Object.values(dataMap);
-        
-        // 按日期排序
-        dataArray.sort((a, b) => new Date(a.日期) - new Date(b.日期));
-        
-        if (dataArray.length === 0) {
-            alert('没有可导出的数据');
-            return;
-        }
-        
-        // 创建工作簿
-        const wb = XLSX.utils.book_new();
-        
-        // 创建工作表
-        const ws = XLSX.utils.json_to_sheet(dataArray);
-        
-        // 将工作表添加到工作簿
-        XLSX.utils.book_append_sheet(wb, ws, '股票数据');
-        
-        // 生成Excel文件并下载
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const dateString = `${year}${month}${day}`;
-        
-        // 修复中文列名乱码问题 - 使用UTF-8编码
-        XLSX.writeFile(wb, `${stockData.stock_name}(${stockData.stock_code})_${dateString}.xlsx`, {
-            bookType: 'xlsx',
-            type: 'binary',
-            cellStyles: true
-        });
-    }
 
-    // 输入框回车键支持
-    document.getElementById('stockCode').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            document.getElementById('confirmBtn').click();
-        }
-    });
-</script>
+        // 输入框回车键支持
+        document.getElementById('stockCode').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('confirmBtn').click();
+            }
+        });
+    </script>
 </body>
 </html>
