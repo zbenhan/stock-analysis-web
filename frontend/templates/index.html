@@ -276,6 +276,21 @@
             margin: 0 auto;
             padding: 20px;
             line-height: 1.6;
+            text-align: left;
+        }
+
+        .about-content p {
+            margin-bottom: 15px;
+            text-indent: 0;
+        }
+
+        .about-content ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+
+        .about-content li {
+            margin-bottom: 8px;
         }
 
         .modal-content {
@@ -761,9 +776,9 @@
                 <i class="fas fa-chart-line"></i>
                 个股概览
             </a>
-            <a class="nav-item" data-panel="observation-log-panel">
-                <i class="fas fa-newspaper"></i>
-                观察日志
+            <a class="nav-item" data-panel="indicator-screening-panel">
+                <i class="fas fa-filter"></i>
+                指标筛查
             </a>
             <a class="nav-item" data-panel="knowledge-research-panel">
                 <i class="fas fa-book"></i>
@@ -771,7 +786,7 @@
             </a>
             <a class="nav-item" data-panel="about-panel">
                 <i class="fas fa-info-circle"></i>
-                关于网站
+                关于本站
             </a>
         </nav>
 
@@ -797,11 +812,11 @@
                 </div>
             </div>
 
-            <div class="content-panel" id="observation-log-panel">
+            <div class="content-panel" id="indicator-screening-panel">
                 <div class="control-panel">
-                    <h3 class="panel-title">观察日志</h3>
+                    <h3 class="panel-title">指标筛查</h3>
                     <div class="panel-content">
-                        <p>这里是A股市场的观察日志，记录每日市场动态和投资观察。</p>
+                        <p>基于多种财务指标和技术指标，对A股市场进行智能筛查和分析。</p>
                         <p>功能正在开发中，敬请期待...</p>
                     </div>
                 </div>
@@ -825,10 +840,31 @@
 
             <div class="content-panel" id="about-panel">
                 <div class="control-panel">
-                    <h3 class="panel-title">关于网站</h3>
-                    <div class="panel-content">
-                        <p>A-SHARE.TOP 是一个专注于A股市场分析的数据平台。</p>
-                        <p>我们提供股票价值分析、市场趋势观察等服务，帮助投资者做出更明智的投资决策。</p>
+                    <h3 class="panel-title">关于本站</h3>
+                    <div class="panel-content about-content">
+                        <p><strong>A-SHARE.TOP - 一个A股观察站</strong></p>
+        
+                        <p>这是一个专注于中国A股市场研究的独立平台，致力于通过数据可视化和基本面分析，帮助投资者更深入地理解上市公司价值。</p>
+        
+                        <p><strong>核心功能：</strong><br>
+                            个股概览：企业价值分析。对企业价格及价值进行综合分析。<br>
+                             指标筛查：对A股上市企业指标进行动态筛选分析。<br>
+                             知识研究：投资知识研究与方法论分享。<br>
+                        </p>
+        
+                        <p><strong>数据说明：</strong><br>
+                            基于公开市场数据，定期更新，力求准确反映市场状况。</p>
+        
+                        <p><strong>使用指南：</strong><br>
+                             个股概览：手动输入或使用批量导入代码进行股票分析。<br>
+                             指标筛查：使用批量导入处理多股票分析。<br>
+                             知识研究：在知识库中查阅心得与方法。支持对文章名称、简介、分类进行查找。文章分类包括：名著品介、传奇人物、投研心得。</p>
+        
+                        <p><strong>免责声明：</strong><br>
+                            本站内容仅供参考，不构成投资建议。投资有风险，决策需谨慎。</p>
+        
+                        <p><strong>联系我们：</strong><br>
+                             zbenhan@126.com</p>
                     </div>
                 </div>
             </div>
