@@ -75,16 +75,17 @@
                 background-size: contain;
             }
 
-        .main-container {
-            display: flex;
-            min-height: calc(100vh - 100px);
-            margin-top: 100px;
-        }
-
+        /* 修改侧边栏样式，使其固定定位 - 桌面端 */
         .sidebar {
             width: 200px;
             padding: 30px 0;
-            position: relative;
+            position: fixed;
+            top: 100px;
+            left: 0;
+            height: calc(100vh - 100px);
+            overflow-y: auto;
+            z-index: 999;
+            background-color: var(--paper-white);
         }
 
             .sidebar::before {
@@ -96,6 +97,14 @@
                 width: 1px;
                 background: linear-gradient(to bottom, transparent, var(--sketch-line), transparent);
             }
+
+        /* 调整主容器，为固定侧边栏留出空间 - 桌面端 */
+        .main-container {
+            display: flex;
+            min-height: calc(100vh - 100px);
+            margin-top: 100px;
+            margin-left: 200px;
+        }
 
         .nav-item {
             padding: 15px 25px;
@@ -655,15 +664,65 @@
             margin-left: 15px;
         }
 
+        /* 移动端底部固定导航栏 */
+        .mobile-bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: var(--light-yellow);
+            border-top: 2px dashed var(--sketch-line);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 10px 0;
+            z-index: 1000;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: none; /* 默认隐藏，在移动端显示 */
+        }
+
+        /* 底部导航项 */
+        .mobile-nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--pencil-gray);
+            padding: 8px 12px;
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .mobile-nav-item.active {
+            color: var(--accent-blue);
+            background: rgba(74, 144, 226, 0.1);
+        }
+
+        .mobile-nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+
+        .mobile-nav-item span {
+            font-size: 0.7rem;
+            text-align: center;
+            line-height: 1.1;
+        }
+
         @media (max-width: 768px) {
+            /* 隐藏桌面端侧边栏 */
             .sidebar {
-                width: 100%;
-                order: 2;
+                display: none;
             }
 
+            /* 调整主容器 */
             .main-container {
                 flex-direction: column;
                 margin-top: 80px;
+                margin-left: 0;
+                margin-bottom: 70px; /* 为底部导航留出空间 */
             }
 
             .header-title {
@@ -759,6 +818,54 @@
             .article-header > div {
                 flex-direction: column;
                 align-items: flex-start;
+            }
+
+            /* 显示移动端底部导航 */
+            .mobile-bottom-nav {
+                display: flex;
+            }
+
+            /* 内容区域在移动端的额外内边距 */
+            .content-area {
+                padding-bottom: 20px;
+            }
+        }
+
+        /* 针对小屏幕的优化 */
+        @media (max-width: 480px) {
+            .mobile-nav-item {
+                padding: 6px 8px;
+            }
+
+            .mobile-nav-item i {
+                font-size: 1.1rem;
+            }
+
+            .mobile-nav-item span {
+                font-size: 0.65rem;
+            }
+
+            .mobile-bottom-nav {
+                padding: 8px 0;
+            }
+
+            .main-container {
+                margin-bottom: 65px;
+            }
+        }
+
+        /* 针对横屏模式的优化 */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .mobile-bottom-nav {
+                padding: 6px 0;
+            }
+
+            .mobile-nav-item {
+                padding: 4px 8px;
+            }
+
+            .main-container {
+                margin-bottom: 60px;
             }
         }
     </style>
@@ -871,6 +978,26 @@
         </main>
     </div>
 
+    <!-- 移动端底部导航栏 -->
+    <div class="mobile-bottom-nav">
+        <a class="mobile-nav-item active" data-panel="overview-panel">
+            <i class="fas fa-chart-line"></i>
+            <span>个股概览</span>
+        </a>
+        <a class="mobile-nav-item" data-panel="indicator-screening-panel">
+            <i class="fas fa-filter"></i>
+            <span>指标筛查</span>
+        </a>
+        <a class="mobile-nav-item" data-panel="knowledge-research-panel">
+            <i class="fas fa-book"></i>
+            <span>知识研究</span>
+        </a>
+        <a class="mobile-nav-item" data-panel="about-panel">
+            <i class="fas fa-info-circle"></i>
+            <span>关于本站</span>
+        </a>
+    </div>
+
     <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
 
     <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
@@ -947,6 +1074,61 @@
             return cookieValue;
         }
 
+        // 移动端导航功能
+        function initializeMobileNavigation() {
+            const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+            const desktopNavItems = document.querySelectorAll('.nav-item');
+            const mobileBottomNav = document.querySelector('.mobile-bottom-nav');
+
+            // 检测是否为移动端并显示底部导航
+            function checkMobileView() {
+                if (window.innerWidth <= 768) {
+                    mobileBottomNav.style.display = 'flex';
+                } else {
+                    mobileBottomNav.style.display = 'none';
+                }
+            }
+
+            // 初始检查
+            checkMobileView();
+
+            // 窗口大小改变时检查
+            window.addEventListener('resize', checkMobileView);
+
+            // 移动端导航点击事件
+            mobileNavItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // 更新移动端导航激活状态
+                    mobileNavItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+
+                    // 更新桌面端导航激活状态（保持同步）
+                    const panelId = this.getAttribute('data-panel');
+                    desktopNavItems.forEach(nav => {
+                        if (nav.getAttribute('data-panel') === panelId) {
+                            nav.classList.add('active');
+                        } else {
+                            nav.classList.remove('active');
+                        }
+                    });
+
+                    // 切换面板
+                    document.querySelectorAll('.content-panel').forEach(panel => {
+                        panel.classList.remove('active');
+                    });
+                    document.getElementById(panelId).classList.add('active');
+
+                    // 如果是知识研究面板，初始化文章
+                    if (panelId === 'knowledge-research-panel') {
+                        setTimeout(() => {
+                            renderArticles('knowledge-research', 'knowledge-research-articles');
+                            setupArticleSearch();
+                        }, 100);
+                    }
+                });
+            });
+        }
+
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function () {
                 document.querySelectorAll('.nav-item').forEach(nav => {
@@ -962,6 +1144,24 @@
                 });
 
                 document.getElementById(panelId).classList.add('active');
+
+                // 同步移动端导航状态
+                const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+                mobileNavItems.forEach(nav => {
+                    if (nav.getAttribute('data-panel') === panelId) {
+                        nav.classList.add('active');
+                    } else {
+                        nav.classList.remove('active');
+                    }
+                });
+
+                // 如果是知识研究面板，初始化文章
+                if (panelId === 'knowledge-research-panel') {
+                    setTimeout(() => {
+                        renderArticles('knowledge-research', 'knowledge-research-articles');
+                        setupArticleSearch();
+                    }, 100);
+                }
             });
         });
 
@@ -985,6 +1185,16 @@
                     targetNavItem.classList.add('active');
                     targetPanel.classList.add('active');
             
+                    // 同步移动端导航状态
+                    const mobileNavItems = document.querySelectorAll('.mobile-nav-item');
+                    mobileNavItems.forEach(nav => {
+                        if (nav.getAttribute('data-panel') === `${panelParam}-panel`) {
+                            nav.classList.add('active');
+                        } else {
+                            nav.classList.remove('active');
+                        }
+                    });
+            
                     if (panelParam === 'knowledge-research') {
                         setTimeout(() => {
                             renderArticles('knowledge-research', 'knowledge-research-articles');
@@ -998,6 +1208,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             checkUrlParamsAndSwitchPanel();
             initializeKnowledgeResearch();
+            initializeMobileNavigation(); // 初始化移动端导航
         });
 
         document.getElementById('confirmBtn').addEventListener('click', function () {
