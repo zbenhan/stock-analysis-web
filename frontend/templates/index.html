@@ -6,13 +6,12 @@
     <title>A-SHARE.TOP    一个A股观察站</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- 添加SheetJS库 -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- 添加Chart.js库 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="/static/js/articles-data.js"></script>
+    <script src="/static/js/articles-utils.js"></script>
     <style>
-        /* 保持原有的CSS样式不变 */
         * {
             margin: 0;
             padding: 0;
@@ -27,7 +26,7 @@
             --sketch-line: #d3d3d3;
             --blue-green: #2cbfc7;
             --light-yellow: #fffacd;
-            --blue-black: #2c3e50; /* 新增蓝黑色 */
+            --blue-black: #2c3e50;
         }
 
         body {
@@ -38,27 +37,31 @@
             position: relative;
         }
 
-        /* 顶部标题区域 */
         .header-section {
             padding: 20px 0;
             text-align: left;
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
             background-color: var(--light-yellow);
             background-image: linear-gradient(to right, transparent 0%, var(--sketch-line) 50%, transparent 100%);
             background-size: 200% 1px;
             background-repeat: no-repeat;
             background-position: center bottom;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
         .header-title {
             font-size: 2.2rem;
-            color: var(--blue-black); /* 修改为蓝黑色 */
+            color: var(--blue-black);
             display: inline-block;
             position: relative;
             font-weight: normal;
             letter-spacing: 1px;
             margin-left: 30px;
-            font-family: 'Calibri', sans-serif; /* 添加Calibri字体 */
+            font-family: 'Calibri', sans-serif;
         }
 
             .header-title::after {
@@ -72,13 +75,12 @@
                 background-size: contain;
             }
 
-        /* 主布局 */
         .main-container {
             display: flex;
             min-height: calc(100vh - 100px);
+            margin-top: 100px;
         }
 
-        /* 左侧导航 */
         .sidebar {
             width: 200px;
             padding: 30px 0;
@@ -142,16 +144,14 @@
                 font-size: 1.2rem;
             }
 
-        /* 主内容区 - 修改：确保内容水平居中 */
         .content-area {
             flex: 1;
             padding: 40px;
             display: flex;
-            justify-content: center; /* 水平居中 */
-            align-items: flex-start; /* 顶部对齐 */
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        /* 控制面板 - 修改：确保内容居中 */
         .control-panel {
             width: 100%;
             max-width: 600px;
@@ -163,10 +163,9 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-align: center; /* 确保文本居中 */
+            text-align: center;
         }
 
-        /* 表单元素 - 修改：确保居中 */
         .form-group {
             margin-bottom: 40px;
             position: relative;
@@ -195,7 +194,6 @@
                 box-shadow: 0 2px 0 -1px var(--accent-blue);
             }
 
-        /* 按钮 */
         .btn-custom {
             background: transparent;
             border: 2px dashed var(--accent-blue);
@@ -224,7 +222,6 @@
                 transform: rotate(1deg) scale(0.98);
             }
 
-        /* 链接样式 */
         .link-group {
             display: flex;
             justify-content: center;
@@ -256,19 +253,17 @@
                 margin-right: 5px;
             }
 
-        /* 内容面板样式 - 修改：确保居中 */
         .content-panel {
             width: 100%;
             display: none;
-            text-align: center; /* 确保文本居中 */
+            text-align: center;
         }
 
             .content-panel.active {
                 display: flex;
-                justify-content: center; /* 水平居中 */
+                justify-content: center;
             }
 
-        /* 面板标题样式 */
         .panel-title {
             font-size: 1.8rem;
             color: var(--blue-black);
@@ -276,7 +271,6 @@
             font-family: 'Calibri', sans-serif;
         }
 
-        /* 面板内容样式 */
         .panel-content {
             max-width: 800px;
             margin: 0 auto;
@@ -284,7 +278,6 @@
             line-height: 1.6;
         }
 
-        /* 模态框样式 */
         .modal-content {
             border-radius: 15px;
             border: 2px solid var(--sketch-line);
@@ -300,7 +293,6 @@
             font-weight: normal;
         }
 
-        /* 图表导航按钮样式 - 底部居中 */
         .chart-nav {
             display: flex;
             justify-content: center;
@@ -348,7 +340,6 @@
             text-align: center;
         }
 
-        /* 修改：模态框底部布局调整 - 下载按钮在左右两端，导航居中 */
         .modal-footer {
             display: flex;
             justify-content: space-between;
@@ -361,23 +352,22 @@
         .footer-left {
             display: flex;
             align-items: center;
-            order: 1; /* 将下载图表按钮放在左侧 */
+            order: 1;
         }
 
         .footer-center {
             flex: 1;
             display: flex;
             justify-content: center;
-            order: 2; /* 将导航放在中间 */
+            order: 2;
         }
 
         .footer-right {
             display: flex;
             align-items: center;
-            order: 3; /* 将下载数据按钮放在右侧 */
+            order: 3;
         }
 
-        /* 下载按钮样式 - 使用页面顶框的颜色 */
         .btn-download {
             background-color: var(--light-yellow);
             color: var(--pencil-gray);
@@ -405,30 +395,25 @@
                 transform: rotate(1deg) scale(0.98);
             }
 
-        /* 缩小弹窗尺寸的样式 */
         .modal-xl {
-            max-width: 900px; /* 从默认的1140px缩小到900px */
+            max-width: 900px;
         }
 
-        /* 模态框内容区域调整 */
         .modal-body {
             padding: 1rem;
-            max-height: 500px; /* 限制最大高度 */
-            overflow-y: auto; /* 如果内容过多可以滚动 */
+            max-height: 500px;
+            overflow-y: auto;
         }
 
-        /* 图表容器样式 */
         #chartContainer {
             width: 100%;
             height: 400px;
         }
 
-        /* 模态框标题调整 */
         .modal-title {
-            font-size: 1.1rem; /* 稍微缩小标题字体 */
+            font-size: 1.1rem;
         }
 
-        /* 模态框头部和底部调整 */
         .modal-header {
             padding: 0.75rem 1rem;
         }
@@ -437,25 +422,224 @@
             padding: 0.75rem 1rem;
         }
 
-        /* 导航按钮调整 */
         .nav-btn {
-            width: 35px; /* 从40px缩小到35px */
+            width: 35px;
             height: 35px;
-            font-size: 1rem; /* 从1.2rem缩小到1rem */
+            font-size: 1rem;
         }
 
         .chart-counter {
-            font-size: 1rem; /* 从1.1rem缩小到1rem */
-            min-width: 70px; /* 从80px缩小到70px */
+            font-size: 1rem;
+            min-width: 70px;
         }
 
-        /* 下载按钮调整 */
         .btn-download {
-            padding: 6px 15px; /* 从8px 20px缩小 */
-            font-size: 0.9rem; /* 从1rem缩小到0.9rem */
+            padding: 6px 15px;
+            font-size: 0.9rem;
         }
 
-        /* 响应式设计 */
+        .articles-container {
+            margin-top: 30px;
+        }
+
+        .article-item {
+            border: none;
+            border-radius: 0;
+            padding: 4px 0;
+            margin-bottom: 20px;
+            background: transparent;
+            transition: all 0.3s ease;
+        }
+
+        .article-item:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.7);
+        }
+
+        .article-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0px;
+        }
+
+        .article-title {
+            color: var(--blue-black);
+            font-size: 1.3rem;
+            margin: 0;
+            flex: 1;
+            line-height: 2;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .article-title-link {
+            color: var(--blue-black);
+            font-size: 1rem;
+            line-height: 1.0;
+            cursor: pointer;
+            text-decoration: underline;
+            display: inline-flex;
+            margin-bottom: 5px;
+        }
+
+        .article-date-link {
+            color: var(--blue-black);
+            font-size: 1rem;
+            line-height: 1.2;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-left: 15px;
+            white-space: nowrap;
+        }
+
+        .article-meta {
+            color: var(--pencil-gray);
+            font-size: 0.9rem;
+            white-space: nowrap;
+            margin-left: 15px;
+        }
+
+        .article-description {
+            color: var(--pencil-gray);
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .article-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .keyword-tag {
+            display: inline-block;
+            background: var(--light-yellow);
+            color: var(--pencil-gray);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            border: 1px dashed var(--sketch-line);
+        }
+
+        .btn-read-article {
+            background: transparent;
+            border: 2px dashed var(--accent-green);
+            color: var(--accent-green);
+            padding: 6px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .btn-read-article:hover {
+            background: rgba(126, 211, 33, 0.1);
+            border-style: solid;
+        }
+
+        .article-controls {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0 20px 0;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .search-box .fa-search {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--pencil-gray);
+        }
+
+        .filter-options {
+            min-width: 150px;
+        }
+
+        .article-meta-info {
+            background: var(--light-yellow);
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .article-meta-info span {
+            color: var(--pencil-gray);
+            font-size: 0.9rem;
+        }
+
+        .article-content {
+            line-height: 1.8;
+            color: var(--pencil-gray);
+            margin-bottom: 20px;
+        }
+
+        .related-articles {
+            border-top: 1px dashed var(--sketch-line);
+            padding-top: 15px;
+        }
+
+        .related-articles h6 {
+            color: var(--blue-black);
+            margin-bottom: 10px;
+        }
+
+        .related-link {
+            display: block;
+            color: var(--accent-blue);
+            text-decoration: none;
+            padding: 5px 0;
+            border-bottom: 1px dashed transparent;
+            transition: all 0.3s ease;
+        }
+
+        .related-link:hover {
+            color: var(--accent-green);
+            border-bottom-color: var(--accent-green);
+        }
+
+        .no-articles {
+            text-align: center;
+            color: var(--pencil-gray);
+            font-style: italic;
+            padding: 40px 0;
+        }
+
+        #knowledge-research-panel .control-panel {
+            padding-top: 20px;
+        }
+
+        #knowledge-research-panel .panel-content {
+            padding-top: 10px;
+        }
+
+        .article-header > div {
+            display: flex;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .article-title-link {
+            flex: 1;
+        }
+
+        .article-date-link {
+            flex-shrink: 0;
+            margin-left: 15px;
+        }
+
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
@@ -464,11 +648,16 @@
 
             .main-container {
                 flex-direction: column;
+                margin-top: 80px;
             }
 
             .header-title {
                 font-size: 1.8rem;
                 margin-left: 15px;
+            }
+
+            .header-section {
+                padding: 15px 0;
             }
 
             .control-panel {
@@ -496,35 +685,30 @@
                 margin: 10px 0;
             }
 
-            /* 移动设备上进一步缩小弹窗 */
             .modal-xl {
-                max-width: 95%; /* 在移动设备上使用百分比 */
+                max-width: 95%;
                 margin: 1rem auto;
             }
 
             .modal-body {
-                max-height: 400px; /* 移动设备上进一步限制高度 */
+                max-height: 400px;
             }
 
-            /* 修改：移动设备上保持图表宽高比 */
             #chartContainer {
-                height: 300px; /* 保持与电脑版相同的宽高比 */
+                height: 300px;
                 position: relative;
             }
 
-            /* 确保图表在移动设备上保持比例 */
             #chartCanvas {
                 width: 100% !important;
                 height: 100% !important;
             }
 
-            /* 新增：移动设备上图表节点更小 */
             .mobile-chart-points {
                 pointRadius: 2 !important;
                 pointHoverRadius: 3 !important;
             }
 
-            /* 新增：移动设备上底部按钮布局 */
             .mobile-footer-buttons {
                 display: flex;
                 justify-content: center;
@@ -537,21 +721,41 @@
                     flex: 1;
                     max-width: 140px;
                 }
+
+            .article-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .article-title-link, .article-date-link {
+                font-size: 1rem;
+                line-height: 1.2;
+            }
+
+            .article-date-link {
+                margin-left: 0;
+                margin-top: 5px;
+            }
+
+            #knowledge-research-panel .control-panel {
+                padding-top: 15px;
+            }
+
+            .article-header > div {
+                flex-direction: column;
+                align-items: flex-start;
+            }
         }
     </style>
-    <!-- 51la页面统计 -->
     <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
     <script>LA.init({ id: "3NlvSR2kT1afN6AF", ck: "3NlvSR2kT1afN6AF" })</script>
 </head>
 <body>
-    <!-- 顶部标题区域 -->
     <div class="header-section">
         <h1 class="header-title">A-SHARE.TOP</h1>
     </div>
 
-    <!-- 主容器 -->
     <div class="main-container">
-        <!-- 左侧导航栏 -->
         <nav class="sidebar">
             <a class="nav-item active" data-panel="overview-panel">
                 <i class="fas fa-chart-line"></i>
@@ -571,9 +775,7 @@
             </a>
         </nav>
 
-        <!-- 主内容区 -->
         <main class="content-area">
-            <!-- 个股概览面板 -->
             <div class="content-panel active" id="overview-panel">
                 <div class="control-panel">
                     <div class="form-group">
@@ -595,7 +797,6 @@
                 </div>
             </div>
 
-            <!-- 观察日志面板 -->
             <div class="content-panel" id="observation-log-panel">
                 <div class="control-panel">
                     <h3 class="panel-title">观察日志</h3>
@@ -606,18 +807,22 @@
                 </div>
             </div>
 
-            <!-- 知识研究面板 -->
             <div class="content-panel" id="knowledge-research-panel">
                 <div class="control-panel">
-                    <h3 class="panel-title">知识研究</h3>
                     <div class="panel-content">
-                        <p>这里是A股投资知识研究区域，包含投资理论、分析方法等内容。</p>
-                        <p>功能正在开发中，敬请期待...</p>
+                        <div class="article-controls">
+                            <div class="search-box">
+                                <input type="text" id="articleSearch" class="form-control" placeholder="搜索文章...">
+                                <i class="fas fa-search"></i>
+                            </div>
+                        </div>
+
+                        <div id="knowledge-research-articles" class="articles-container">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 关于网站面板 -->
             <div class="content-panel" id="about-panel">
                 <div class="control-panel">
                     <h3 class="panel-title">关于网站</h3>
@@ -630,10 +835,8 @@
         </main>
     </div>
 
-    <!-- 隐藏的文件输入框 -->
     <input type="file" id="fileInput" accept=".xlsx" style="display: none;">
 
-    <!-- 图表显示模态框 -->
     <div class="modal fade" id="chartModal" tabindex="-1" aria-labelledby="chartModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
@@ -647,14 +850,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <!-- 修改：下载图表按钮放在左侧 -->
                     <div class="footer-left">
                         <button type="button" class="btn-download" onclick="downloadCurrentChart()">
                             <i class="fas fa-download"></i> 下载图表
                         </button>
                     </div>
                     <div class="footer-center">
-                        <!-- 图表导航居中 -->
                         <div class="chart-nav">
                             <button class="nav-btn" id="prevChart" title="上一个图表 (左箭头)">
                                 <i class="fas fa-chevron-left"></i>
@@ -667,14 +868,12 @@
                             </button>
                         </div>
                     </div>
-                    <!-- 修改：下载数据按钮放在右侧 -->
                     <div class="footer-right">
                         <button type="button" class="btn-download" onclick="downloadCurrentData()">
                             <i class="fas fa-table"></i> 下载数据
                         </button>
                     </div>
 
-                    <!-- 新增：移动设备上的按钮布局 -->
                     <div class="mobile-footer-buttons" style="display: none;">
                         <button type="button" class="btn-download" onclick="downloadCurrentChart()">
                             <i class="fas fa-download"></i> 下载图表
@@ -688,18 +887,15 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // 全局变量存储图表数据
         let stocksData = [];
         let currentChartIndex = 0;
         let chartModal = null;
         let originalButtonText = '';
         let currentChart = null;
 
-        // 获取CSRF token的辅助函数
         function getCookie(name) {
             let cookieValue = null;
             if (document.cookie && document.cookie !== '') {
@@ -715,50 +911,73 @@
             return cookieValue;
         }
 
-        // 导航栏切换功能
         document.querySelectorAll('.nav-item').forEach(item => {
             item.addEventListener('click', function () {
-                // 移除所有导航项的active类
                 document.querySelectorAll('.nav-item').forEach(nav => {
                     nav.classList.remove('active');
                 });
 
-                // 为当前点击的导航项添加active类
                 this.classList.add('active');
 
-                // 获取要显示的面板ID
                 const panelId = this.getAttribute('data-panel');
 
-                // 隐藏所有内容面板
                 document.querySelectorAll('.content-panel').forEach(panel => {
                     panel.classList.remove('active');
                 });
 
-                // 显示选中的内容面板
                 document.getElementById(panelId).classList.add('active');
             });
         });
 
-        // 确认按钮点击事件
+         function checkUrlParamsAndSwitchPanel() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const panelParam = urlParams.get('panel');
+    
+            if (panelParam) {
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+        
+                document.querySelectorAll('.content-panel').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+        
+                const targetNavItem = document.querySelector(`.nav-item[data-panel="${panelParam}-panel"]`);
+                const targetPanel = document.getElementById(`${panelParam}-panel`);
+        
+                if (targetNavItem && targetPanel) {
+                    targetNavItem.classList.add('active');
+                    targetPanel.classList.add('active');
+            
+                    if (panelParam === 'knowledge-research') {
+                        setTimeout(() => {
+                            renderArticles('knowledge-research', 'knowledge-research-articles');
+                            setupArticleSearch();
+                        }, 100);
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUrlParamsAndSwitchPanel();
+            initializeKnowledgeResearch();
+        });
+
         document.getElementById('confirmBtn').addEventListener('click', function () {
             const stockCode = document.getElementById('stockCode').value.trim();
 
-            // 保存原始按钮文本
             originalButtonText = this.innerHTML;
 
             if (!stockCode) {
-                // 弹出确认对话框
                 if (confirm('文本框为空，是否随机查询10支股票？')) {
-                    // 用户点击"是"，获取随机股票代码
                     getRandomStockCodes();
                 } else {
-                    // 用户点击"否"，恢复按钮状态
                     restoreButtonState();
                 }
                 return;
             }
 
-            // 验证股票代码格式（可以是多个代码用分号分隔）
             const codes = stockCode.split(';').map(code => code.trim()).filter(code => code);
             for (let code of codes) {
                 if (code.length !== 6 || isNaN(code)) {
@@ -768,21 +987,17 @@
                 }
             }
 
-            // 显示加载状态
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 获取数据中...';
             this.disabled = true;
 
-            // 调用获取数据函数
             getStockData(stockCode);
         });
 
-        // 获取随机股票代码
         function getRandomStockCodes() {
             const confirmBtn = document.getElementById('confirmBtn');
             confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 获取随机股票中...';
             confirmBtn.disabled = true;
 
-            // 调用随机股票代码API
             fetch('/api/get-random-stocks/', {
                 method: 'POST',
                 headers: {
@@ -794,10 +1009,7 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        // 将随机股票代码填入文本框
                         document.getElementById('stockCode').value = data.stock_codes;
-
-                        // 使用随机股票代码获取数据
                         getStockData(data.stock_codes);
                     } else {
                         alert('获取随机股票代码失败: ' + data.error);
@@ -811,9 +1023,7 @@
                 });
         }
 
-        // 获取股票数据函数
         function getStockData(stockCode) {
-            // Ajax调用后端API
             fetch('/api/get-stock-data/', {
                 method: 'POST',
                 headers: {
@@ -825,13 +1035,10 @@
                 })
             })
                 .then(response => {
-                    // 首先检查响应类型
                     const contentType = response.headers.get('content-type');
 
                     if (!contentType || !contentType.includes('application/json')) {
-                        // 如果不是JSON响应，读取文本内容并显示
                         return response.text().then(htmlContent => {
-                            // 在新窗口中显示HTML内容
                             displayHtmlResponse(htmlContent);
                             throw new Error('服务器返回了HTML页面而不是JSON数据');
                         });
@@ -846,13 +1053,11 @@
                     return response.json();
                 })
                 .then(data => {
-                    // 恢复按钮状态
                     restoreButtonState();
 
                     console.log('响应数据:', data);
 
                     if (data.success) {
-                        // 存储股票数据
                         stocksData = data.stocks_data || [];
                         currentChartIndex = 0;
 
@@ -861,17 +1066,13 @@
                             return;
                         }
 
-                        // 显示图表模态框
                         showChart(currentChartIndex);
 
-                        // 初始化模态框
                         if (!chartModal) {
                             chartModal = new bootstrap.Modal(document.getElementById('chartModal'));
 
-                            // 新增：监听模态框隐藏事件，清空文本框
                             document.getElementById('chartModal').addEventListener('hidden.bs.modal', function () {
                                 document.getElementById('stockCode').value = '';
-                                // 销毁图表释放内存
                                 if (currentChart) {
                                     currentChart.destroy();
                                     currentChart = null;
@@ -886,22 +1087,17 @@
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    // 恢复按钮状态
                     restoreButtonState();
-
-                    // 错误信息已经在新窗口中显示，这里只显示简要提示
                     alert('请求失败，详细错误信息已在新窗口中显示');
                 });
         }
 
-        // 恢复按钮状态
         function restoreButtonState() {
             const confirmBtn = document.getElementById('confirmBtn');
             confirmBtn.innerHTML = originalButtonText;
             confirmBtn.disabled = false;
         }
 
-        // 显示指定索引的图表
         function showChart(index) {
             if (index < 0 || index >= stocksData.length) {
                 return;
@@ -909,23 +1105,18 @@
 
             const stockData = stocksData[index];
 
-            // 销毁之前的图表
             if (currentChart) {
                 currentChart.destroy();
             }
 
-            // 创建新图表
             const ctx = document.getElementById('chartCanvas').getContext('2d');
 
-            // 检测是否为移动设备
             const isMobile = window.innerWidth <= 768;
 
-            // 准备数据 - 修复年份显示问题：将年份减1
             const marketCapData = stockData.market_cap_data
                 .filter(item => item.market_capitalization > 0)
                 .map(item => {
                     const date = new Date(item.data_date);
-                    // 年份减1
                     date.setFullYear(date.getFullYear() - 1);
                     return {
                         x: date,
@@ -937,7 +1128,6 @@
                 .filter(item => item.net_profit_parent_quarterly !== null && item.net_profit_parent_quarterly !== 0)
                 .map(item => {
                     const date = new Date(item.data_date);
-                    // 年份减1
                     date.setFullYear(date.getFullYear() - 1);
                     return {
                         x: date,
@@ -945,14 +1135,12 @@
                     };
                 });
 
-            // 计算Y轴的单位
             const marketCapValues = marketCapData.map(item => Math.abs(item.y));
             const profitValues = profitData.map(item => Math.abs(item.y));
 
             const maxMarketCap = Math.max(...marketCapValues);
             const maxProfit = Math.max(...profitValues);
 
-            // 确定市值轴的单位
             let marketCapUnit = '';
             let marketCapDivisor = 1;
             if (maxMarketCap >= 100000000) {
@@ -963,7 +1151,6 @@
                 marketCapDivisor = 10000;
             }
 
-            // 确定净利润轴的单位
             let profitUnit = '';
             let profitDivisor = 1;
             if (maxProfit >= 100000000) {
@@ -974,14 +1161,11 @@
                 profitDivisor = 10000;
             }
 
-            // 格式化数值，去除末尾的0
             function formatNumber(value, divisor) {
                 const num = value / divisor;
-                // 使用toFixed(2)然后去除末尾的0
                 return num.toFixed(2).replace(/\.?0+$/, '');
             }
 
-            // 根据设备类型设置节点大小
             const pointRadius = isMobile ? 2 : 3;
             const pointHoverRadius = isMobile ? 3 : 5;
 
@@ -996,8 +1180,8 @@
                             backgroundColor: 'rgba(0, 0, 139, 0.1)',
                             yAxisID: 'y',
                             tension: 0.1,
-                            pointRadius: pointRadius, // 根据设备类型设置
-                            pointHoverRadius: pointHoverRadius, // 根据设备类型设置
+                            pointRadius: pointRadius,
+                            pointHoverRadius: pointHoverRadius,
                             borderWidth: 2
                         },
                         {
@@ -1007,8 +1191,8 @@
                             backgroundColor: 'rgba(255, 165, 0, 0.1)',
                             yAxisID: 'y1',
                             tension: 0.1,
-                            pointRadius: pointRadius, // 根据设备类型设置
-                            pointHoverRadius: pointHoverRadius, // 根据设备类型设置
+                            pointRadius: pointRadius,
+                            pointHoverRadius: pointHoverRadius,
                             borderWidth: 2
                         }
                     ]
@@ -1022,24 +1206,24 @@
                     },
                     plugins: {
                         legend: {
-                            display: false // 隐藏图例
+                            display: false
                         },
                         title: {
                             display: true,
                             text: `${stockData.stock_name}(${stockData.stock_code})市值与净利润趋势分析`,
                             font: {
-                                size: isMobile ? 14 : 16 // 移动设备上标题字体小一点
+                                size: isMobile ? 14 : 16
                             }
                         },
                         tooltip: {
-                            enabled: false // 禁用鼠标悬停提示
+                            enabled: false
                         }
                     },
                     scales: {
                         x: {
                             type: 'time',
                             time: {
-                                unit: 'year', // 只显示整年
+                                unit: 'year',
                                 displayFormats: {
                                     year: 'yyyy年'
                                 },
@@ -1049,20 +1233,17 @@
                                 display: true,
                                 text: '日期',
                                 font: {
-                                    size: isMobile ? 12 : 14 // 移动设备上字体小一点
+                                    size: isMobile ? 12 : 14
                                 }
                             },
                             grid: {
                                 color: function (context) {
-                                    // 季度线 - 更淡的浅灰色细线
                                     if (context.tick && context.tick.major) {
                                         return 'rgba(220, 220, 220, 0.2)';
                                     }
-                                    // 年线 - 更淡的深灰色粗线
                                     return 'rgba(150, 150, 150, 0.3)';
                                 },
                                 lineWidth: function (context) {
-                                    // 季度线更细，年线更细
                                     if (context.tick && context.tick.major) {
                                         return 0.5;
                                     }
@@ -1070,12 +1251,11 @@
                                 }
                             },
                             ticks: {
-                                // 只显示整年刻度
                                 source: 'auto',
                                 autoSkip: true,
-                                maxTicksLimit: isMobile ? 6 : 10, // 移动设备上显示更少的刻度
+                                maxTicksLimit: isMobile ? 6 : 10,
                                 font: {
-                                    size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
+                                    size: isMobile ? 10 : 12
                                 }
                             }
                         },
@@ -1086,14 +1266,14 @@
                             title: {
                                 display: true,
                                 text: '市值',
-                                color: 'darkblue', // 蓝色标题
+                                color: 'darkblue',
                                 font: {
                                     weight: 'bold',
-                                    size: isMobile ? 12 : 14 // 移动设备上字体小一点
+                                    size: isMobile ? 12 : 14
                                 }
                             },
                             ticks: {
-                                color: 'darkblue', // 蓝色刻度
+                                color: 'darkblue',
                                 callback: function (value) {
                                     if (marketCapDivisor > 1) {
                                         return formatNumber(value, marketCapDivisor) + marketCapUnit;
@@ -1101,21 +1281,17 @@
                                     return value.toLocaleString();
                                 },
                                 font: {
-                                    size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
+                                    size: isMobile ? 10 : 12
                                 }
                             },
-                            // 修复纵向背景线样式，与横向保持一致
                             grid: {
                                 color: function (context) {
-                                    // 季度线 - 更淡的浅灰色细线
                                     if (context.tick && context.tick.major) {
                                         return 'rgba(220, 220, 220, 0.2)';
                                     }
-                                    // 年线 - 更淡的深灰色粗线
                                     return 'rgba(150, 150, 150, 0.3)';
                                 },
                                 lineWidth: function (context) {
-                                    // 季度线更细，年线更细
                                     if (context.tick && context.tick.major) {
                                         return 0.5;
                                     }
@@ -1130,14 +1306,14 @@
                             title: {
                                 display: true,
                                 text: '净利润',
-                                color: 'orange', // 橘黄色标题
+                                color: 'orange',
                                 font: {
                                     weight: 'bold',
-                                    size: isMobile ? 12 : 14 // 移动设备上字体小一点
+                                    size: isMobile ? 12 : 14
                                 }
                             },
                             ticks: {
-                                color: 'orange', // 橘黄色刻度
+                                color: 'orange',
                                 callback: function (value) {
                                     if (profitDivisor > 1) {
                                         return formatNumber(value, profitDivisor) + profitUnit;
@@ -1145,10 +1321,9 @@
                                     return value.toLocaleString();
                                 },
                                 font: {
-                                    size: isMobile ? 10 : 12 // 移动设备上刻度字体小一点
+                                    size: isMobile ? 10 : 12
                                 }
                             },
-                            // 右侧Y轴不显示背景线
                             grid: {
                                 drawOnChartArea: false,
                             },
@@ -1157,7 +1332,6 @@
                 }
             });
 
-            // 更新标题和计数器
             document.getElementById('chartModalLabel').textContent =
                 `${stockData.stock_name}(${stockData.stock_code}) - 市值与净利润趋势分析`;
 
@@ -1167,46 +1341,39 @@
             document.getElementById('prevChart').disabled = index === 0;
             document.getElementById('nextChart').disabled = index === stocksData.length - 1;
 
-            // 根据设备类型调整按钮布局
             adjustFooterLayout(isMobile);
 
             currentChartIndex = index;
         }
 
-        // 根据设备类型调整底部按钮布局
         function adjustFooterLayout(isMobile) {
             const desktopFooterLeft = document.querySelector('.footer-left');
             const desktopFooterRight = document.querySelector('.footer-right');
             const mobileFooterButtons = document.querySelector('.mobile-footer-buttons');
 
             if (isMobile) {
-                // 移动设备：隐藏桌面版按钮，显示移动版按钮
                 desktopFooterLeft.style.display = 'none';
                 desktopFooterRight.style.display = 'none';
                 mobileFooterButtons.style.display = 'flex';
             } else {
-                // 桌面设备：显示桌面版按钮，隐藏移动版按钮
                 desktopFooterLeft.style.display = 'flex';
                 desktopFooterRight.style.display = 'flex';
                 mobileFooterButtons.style.display = 'none';
             }
         }
 
-        // 上一个图表
         document.getElementById('prevChart').addEventListener('click', function () {
             if (currentChartIndex > 0) {
                 showChart(currentChartIndex - 1);
             }
         });
 
-        // 下一个图表
         document.getElementById('nextChart').addEventListener('click', function () {
             if (currentChartIndex < stocksData.length - 1) {
                 showChart(currentChartIndex + 1);
             }
         });
 
-        // 键盘事件监听
         document.addEventListener('keydown', function (e) {
             const modal = document.getElementById('chartModal');
             if (modal && modal.classList.contains('show')) {
@@ -1224,7 +1391,6 @@
                         }
                         break;
                     case 'Escape':
-                        // ESC键关闭模态框
                         if (chartModal) {
                             chartModal.hide();
                         }
@@ -1233,16 +1399,13 @@
             }
         });
 
-        // 模板下载链接点击事件
         document.getElementById('templateBtn').addEventListener('click', function (e) {
             e.preventDefault();
 
-            // 显示下载中状态
             const originalHtml = this.innerHTML;
             this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 下载中...';
             this.disabled = true;
 
-            // 发送下载请求
             fetch('/api/download-template/', {
                 method: 'GET',
                 headers: {
@@ -1256,22 +1419,18 @@
                     return response.blob();
                 })
                 .then(blob => {
-                    // 创建下载链接
                     const url = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.style.display = 'none';
                     a.href = url;
-                    a.download = 'template.xlsx'; // 设置下载文件名
+                    a.download = 'template.xlsx';
 
-                    // 触发下载
                     document.body.appendChild(a);
                     a.click();
 
-                    // 清理
                     window.URL.revokeObjectURL(url);
                     document.body.removeChild(a);
 
-                    // 恢复按钮状态
                     this.innerHTML = originalHtml;
                     this.disabled = false;
 
@@ -1281,32 +1440,26 @@
                     console.error('下载失败:', error);
                     alert('下载失败: ' + error.message);
 
-                    // 恢复按钮状态
                     this.innerHTML = originalHtml;
                     this.disabled = false;
                 });
         });
 
-        // 批量导入链接点击事件
         document.getElementById('batchImportBtn').addEventListener('click', function (e) {
             e.preventDefault();
-            // 触发隐藏的文件输入框点击
             document.getElementById('fileInput').click();
         });
 
-        // 文件选择变化事件
         document.getElementById('fileInput').addEventListener('change', function (e) {
             const file = e.target.files[0];
             if (!file) return;
 
-            // 检查文件类型
             if (!file.name.endsWith('.xlsx')) {
                 alert('请选择Excel文件 (.xlsx)');
-                this.value = ''; // 清空选择
+                this.value = '';
                 return;
             }
 
-            // 显示加载状态
             const batchBtn = document.getElementById('batchImportBtn');
             const originalHtml = batchBtn.innerHTML;
             batchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 读取中...';
@@ -1315,7 +1468,6 @@
             readExcelFile(file, batchBtn, originalHtml);
         });
 
-        // 读取Excel文件的函数
         function readExcelFile(file, batchBtn, originalHtml) {
             const reader = new FileReader();
 
@@ -1324,7 +1476,6 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
 
-                    // 获取第一个工作表
                     const firstSheetName = workbook.SheetNames[0];
                     const worksheet = workbook.Sheets[firstSheetName];
                     const jsonData = XLSX.utils.sheet_to_json(worksheet);
@@ -1335,12 +1486,10 @@
                         throw new Error('Excel文件中没有数据');
                     }
 
-                    // 提取上市公司代码
                     const stockCodes = [];
                     const columnNames = Object.keys(jsonData[0] || {});
                     console.log('列名:', columnNames);
 
-                    // 尝试查找包含"代码"的列名
                     let codeColumn = null;
                     for (let col of columnNames) {
                         if (col.includes('代码') || col.includes('stock') || col.includes('code') || col.toLowerCase().includes('code')) {
@@ -1349,7 +1498,6 @@
                         }
                     }
 
-                    // 如果没有找到特定列名，使用第一列
                     if (!codeColumn && columnNames.length > 0) {
                         codeColumn = columnNames[0];
                     }
@@ -1375,7 +1523,6 @@
                         return;
                     }
 
-                    // 去重并赋值给文本框
                     const uniqueCodes = [...new Set(stockCodes)];
                     document.getElementById('stockCode').value = uniqueCodes.join(';');
 
@@ -1385,7 +1532,6 @@
                     console.error('读取Excel文件失败:', error);
                     alert('读取Excel文件失败: ' + error.message + '\n请确保文件格式正确，包含"上市公司代码"列');
                 } finally {
-                    // 恢复按钮状态
                     batchBtn.innerHTML = originalHtml;
                     batchBtn.style.pointerEvents = 'auto';
                     document.getElementById('fileInput').value = '';
@@ -1402,9 +1548,7 @@
             reader.readAsArrayBuffer(file);
         }
 
-        // 显示HTML响应的函数
         function displayHtmlResponse(htmlContent) {
-            // 创建一个新窗口显示HTML内容
             const newWindow = window.open('', '_blank');
             newWindow.document.write(`
                     <!DOCTYPE html>
@@ -1440,7 +1584,6 @@
                 `);
         }
 
-        // HTML转义函数
         function escapeHtml(unsafe) {
             return unsafe
                 .replace(/&/g, "&amp;")
@@ -1450,7 +1593,6 @@
                 .replace(/'/g, "&#039;");
         }
 
-        // 下载当前图表功能
         function downloadCurrentChart() {
             if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
                 alert('没有可下载的图表');
@@ -1461,7 +1603,6 @@
                 const link = document.createElement('a');
                 const stockData = stocksData[currentChartIndex];
 
-                // 获取当前日期，格式为 yyyymmdd
                 const today = new Date();
                 const year = today.getFullYear();
                 const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -1474,7 +1615,6 @@
             }
         }
 
-        // 下载当前数据功能
         function downloadCurrentData() {
             if (stocksData.length === 0 || currentChartIndex >= stocksData.length) {
                 alert('没有可下载的数据');
@@ -1483,17 +1623,13 @@
 
             const stockData = stocksData[currentChartIndex];
 
-            // 准备数据表格
             const marketCapData = stockData.market_cap_data || [];
             const profitData = stockData.profit_data || [];
 
-            // 合并数据 - 以日期为键
             const dataMap = {};
 
-            // 处理市值数据
             marketCapData.forEach(item => {
                 const date = new Date(item.data_date);
-                // 年份减1
                 date.setFullYear(date.getFullYear() - 1);
                 const dateStr = date.toISOString().split('T')[0];
 
@@ -1503,10 +1639,8 @@
                 dataMap[dateStr]['市值'] = item.market_capitalization;
             });
 
-            // 处理净利润数据
             profitData.forEach(item => {
                 const date = new Date(item.data_date);
-                // 年份减1
                 date.setFullYear(date.getFullYear() - 1);
                 const dateStr = date.toISOString().split('T')[0];
 
@@ -1516,10 +1650,8 @@
                 dataMap[dateStr]['净利润'] = item.net_profit_parent_quarterly;
             });
 
-            // 转换为数组
             const dataArray = Object.values(dataMap);
 
-            // 按日期排序
             dataArray.sort((a, b) => new Date(a.日期) - new Date(b.日期));
 
             if (dataArray.length === 0) {
@@ -1527,23 +1659,18 @@
                 return;
             }
 
-            // 创建工作簿
             const wb = XLSX.utils.book_new();
 
-            // 创建工作表
             const ws = XLSX.utils.json_to_sheet(dataArray);
 
-            // 将工作表添加到工作簿
             XLSX.utils.book_append_sheet(wb, ws, '股票数据');
 
-            // 生成Excel文件并下载
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
             const dateString = `${year}${month}${day}`;
 
-            // 修复中文列名乱码问题 - 使用UTF-8编码
             XLSX.writeFile(wb, `${stockData.stock_name}(${stockData.stock_code})_${dateString}.xlsx`, {
                 bookType: 'xlsx',
                 type: 'binary',
@@ -1551,12 +1678,154 @@
             });
         }
 
-        // 输入框回车键支持
         document.getElementById('stockCode').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 document.getElementById('confirmBtn').click();
             }
         });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeKnowledgeResearch();
+        });
+
+        function initializeKnowledgeResearch() {
+            // 如果当前是知识研究面板，立即渲染文章
+            if (document.getElementById('knowledge-research-panel').classList.contains('active')) {
+                renderArticles('knowledge-research', 'knowledge-research-articles');
+                setupArticleSearch();
+            }
+
+            // 添加点击事件监听器
+            document.querySelector('[data-panel="knowledge-research-panel"]').addEventListener('click', function() {
+                setTimeout(() => {
+                    renderArticles('knowledge-research', 'knowledge-research-articles');
+                    setupArticleSearch();
+                }, 100);
+            });
+        }
+
+        // 修改 setupArticleSearch 函数，正确处理清空搜索框的情况
+        function setupArticleSearch() {
+            const searchInput = document.getElementById('articleSearch');
+    
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    if (this.value.trim() === '') {
+                        // 搜索框为空时，恢复到初始状态（只显示标题和日期）
+                        renderArticles('knowledge-research', 'knowledge-research-articles');
+                    } else {
+                        // 有搜索内容时，显示完整信息（包括简介和关键词）
+                        filterArticles(this.value);
+                    }
+                });
+            }
+        }
+
+        // 修改 renderArticles 函数，只显示标题和日期（初始状态）
+        function renderArticles(category, containerId) {
+            const container = document.getElementById(containerId);
+            const articles = articlesData[category];
+    
+            if (!articles || articles.length === 0) {
+                container.innerHTML = '<p class="no-articles">暂无文章</p>';
+                return;
+            }
+    
+            // 对文章按照id降序排序，id号大的在上面，id号小的在下面
+            const sortedArticles = [...articles].sort((a, b) => b.id - a.id);
+    
+            // 初始状态：只显示标题和日期
+            const articlesHTML = sortedArticles.map(article => `
+                <div class="article-item" data-article-id="${article.id}">
+                    <div class="article-header">
+                        <div>
+                            <a href="${article.url}" class="article-title-link" target="_blank">
+                                ${article.title}
+                            </a>
+                            <span class="article-meta">${article.date}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+    
+            container.innerHTML = articlesHTML;
+        }
+
+        // 修改 filterArticles 函数，确保搜索结果也按id降序排列
+        function filterArticles(searchTerm) {
+                const articles = articlesData['knowledge-research'];
+                const filteredArticles = articles.filter(article => 
+                article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (article.description && article.description.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (article.keywords && article.keywords.some(keyword => 
+                    keyword.toLowerCase().includes(searchTerm.toLowerCase())
+                ))
+            );
+    
+            renderFilteredArticles(filteredArticles);
+        }
+
+        // 修改 renderFilteredArticles 函数，显示完整信息（搜索状态）
+        function renderFilteredArticles(articles) {
+            const container = document.getElementById('knowledge-research-articles');
+
+            if (articles.length === 0) {
+                container.innerHTML = '<p class="no-articles">没有找到相关文章</p>';
+                return;
+            }
+
+            // 对文章按照id降序排序，id号大的在上面，id号小的在下面
+            const sortedArticles = [...articles].sort((a, b) => b.id - a.id);
+
+            // 搜索状态：显示完整信息（标题、日期、简介、关键词）
+            const articlesHTML = sortedArticles.map(article => `
+                <div class="article-item" data-article-id="${article.id}">
+                    <div class="article-header">
+                        <div>
+                            <a href="${article.url}" class="article-title-link" target="_blank">
+                                ${article.title}
+                            </a>
+                            <span class="article-meta">${article.date}</span>
+                        </div>
+                    </div>
+                    ${article.description ? `<p class="article-description">${article.description}</p>` : ''}
+                    ${article.keywords ? `
+                    <div class="article-footer">
+                        <span class="article-keywords">
+                            ${article.keywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
+                        </span>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            container.innerHTML = articlesHTML;
+        }
+
+
+        // 初始化知识研究面板
+        function initializeKnowledgeResearch() {
+            // 如果当前是知识研究面板，立即渲染文章
+            if (document.getElementById('knowledge-research-panel').classList.contains('active')) {
+                renderArticles('knowledge-research', 'knowledge-research-articles');
+                setupArticleSearch();
+            }
+    
+            // 添加点击事件监听器
+            document.querySelector('[data-panel="knowledge-research-panel"]').addEventListener('click', function() {
+                setTimeout(() => {
+                    renderArticles('knowledge-research', 'knowledge-research-articles');
+                    setupArticleSearch();
+                }, 100);
+            });
+        }
+
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            checkUrlParamsAndSwitchPanel();
+            initializeKnowledgeResearch();
+        });
+
     </script>
 </body>
 </html>
