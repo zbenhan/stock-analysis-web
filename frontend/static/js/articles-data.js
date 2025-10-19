@@ -1,4 +1,3 @@
-// 简化的文章数据，只存储元数据
 const articlesData = {
     "knowledge-research": [
         {
@@ -18,10 +17,10 @@ const articlesData = {
             "category": "knowledge-research",
             "description": "查理·芒格智慧结晶的全面解析与投资哲学思考",
             "keywords": ["查理·芒格", "投资哲学", "穷查理宝典"]
-        }
+        },  // ← 这里添加逗号
         {
             "id": 3,
-            "title": "法国密西西比泡沫：全国疯狂的“货币炼金术”",
+            "title": "法国密西西比泡沫：全国疯狂的"货币炼金术"",
             "url": "/articles/mississippi-bubble.html",
             "date": "2025-10-19",
             "category": "knowledge-research",
