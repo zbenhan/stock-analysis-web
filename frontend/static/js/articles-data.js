@@ -19,15 +19,6 @@ const articlesData = {
             "keywords": ["查理·芒格", "投资哲学", "穷查理宝典"]
         },
         {
-            "id": 3,
-            "title": "《穷查理宝典》：当智慧沉淀为一种生活方式",
-            "url": "/articles/poor-charlies-almanack.html",
-            "date": "2025-10-18",
-            "category": "knowledge-research",
-            "description": "查理·芒格智慧结晶的全面解析与投资哲学思考",
-            "keywords": ["查理·芒格", "投资哲学", "穷查理宝典"]
-        },
-        {
             "id": 4,
             "title": "法国密西西比泡沫：全国疯狂的货币炼金术",
             "url": "/articles/mississippi-bubble.html",
