@@ -25,11 +25,11 @@ urlpatterns = [
          TemplateView.as_view(template_name='articles/mississippi-bubble.html'), 
          name='mississippi-bubble'),
 
-    path('articles/mississippi-bubble.html', 
+    path('articles/tulip-mania.html', 
          TemplateView.as_view(template_name='articles/tulip-mania.html'), 
          name='tulip-mania'),
 
-    path('articles/mississippi-bubble.html', 
+    path('articles/great-depression-suicide-shoeshine.html', 
          TemplateView.as_view(template_name='articles/great-depression-suicide-shoeshine.html'), 
          name='great-depression-suicide-shoeshine'),
     
