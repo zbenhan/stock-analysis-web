@@ -21,6 +21,9 @@ urlpatterns = [
          TemplateView.as_view(template_name='articles/beat-the-street.html'), 
          name='beat-the-street'),
  
+    path('articles/mississippi-bubble.html', 
+         TemplateView.as_view(template_name='articles/mississippi-bubble.html'), 
+         name='mississippi-bubble'),
     
     # API路由保持不变
     #path('api/', include('stock_analysis.urls')),
