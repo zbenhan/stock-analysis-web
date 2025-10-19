@@ -19,7 +19,7 @@ const articlesData = {
             "keywords": ["查理·芒格", "投资哲学", "穷查理宝典"]
         },
         {
-            "id": 3,
+            "id": 4,
             "title": "法国密西西比泡沫：全国疯狂的“货币炼金术”",
             "url": "/articles/mississippi-bubble.html",
             "date": "2025-10-19",
@@ -28,7 +28,7 @@ const articlesData = {
             "keywords": ["密西西比泡沫", "约翰·劳", "金融泡沫", "经济泡沫", "投机狂热", "法国经济史", "金融历史", "货币实验", "投机狂潮", "泡沫破裂", "金融崩溃", "投资教训", "密西西比泡沫历史教训", "早期金融投机事件", "金融监管重要性"]
         },
         {
-            "id": 4,
+            "id": 5,
             "title": "郁金香狂热：一朵花换一栋别墅的金融荒谬剧",
             "url": "/articles/tulip-mania.html",
             "date": "2025-10-19",
@@ -37,7 +37,7 @@ const articlesData = {
             "keywords": ["郁金香狂热","金融泡沫","荷兰","投机狂热","郁金香球茎","经济泡沫","金融历史","集体非理性","泡沫破裂","郁金香泡沫"]
         },
         {
-            "id": 5,
+            "id": 6,
             "title": "大萧条时期的“自杀浪潮”与“窗口擦鞋童”",
             "url": "/articles/great-depression-suicide-shoeshine.html",
             "date": "2025-10-19",
