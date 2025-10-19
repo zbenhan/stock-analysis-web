@@ -20,7 +20,7 @@ const articlesData = {
         },
         {
             "id": 3,
-            "title": "法国密西西比泡沫：全国疯狂的“货币炼金术”",
+            "title": "法国密西西比泡沫：全国疯狂的\"货币炼金术\"",
             "url": "/articles/mississippi-bubble.html",
             "date": "2025-10-19",
             "category": "knowledge-research",
@@ -38,7 +38,7 @@ const articlesData = {
         },
         {
             "id": 5,
-            "title": "大萧条时期的“自杀浪潮”与“窗口擦鞋童”",
+            "title": "大萧条时期的\"自杀浪潮\"与\"窗口擦鞋童\"",
             "url": "/articles/great-depression-suicide-shoeshine.html",
             "date": "2025-10-19",
             "category": "knowledge-research",
