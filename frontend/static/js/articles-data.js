@@ -20,7 +20,7 @@ const articlesData = {
         },
         {
             "id": 3,
-            "title": "法国密西西比泡沫：全国疯狂的‘货币炼金术’",
+            "title": "法国密西西比泡沫：全国疯狂的货币炼金术",
             "url": "/articles/mississippi-bubble.html",
             "date": "2025-10-19",
             "category": "knowledge-research",
