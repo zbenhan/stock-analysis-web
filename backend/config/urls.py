@@ -24,6 +24,14 @@ urlpatterns = [
     path('articles/mississippi-bubble.html', 
          TemplateView.as_view(template_name='articles/mississippi-bubble.html'), 
          name='mississippi-bubble'),
+
+    path('articles/mississippi-bubble.html', 
+         TemplateView.as_view(template_name='articles/tulip-mania.html'), 
+         name='tulip-mania'),
+
+    path('articles/mississippi-bubble.html', 
+         TemplateView.as_view(template_name='articles/great-depression-suicide-shoeshine.html'), 
+         name='great-depression-suicide-shoeshine'),
     
     # API路由保持不变
     #path('api/', include('stock_analysis.urls')),
