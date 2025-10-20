@@ -96,3 +96,32 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = False
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+# config/settings.py
+
+#以下是为了解决数据库自github release 下载添加的代码
+import os
+from .data_manager import init_data
+
+# 项目根目录
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# 确保数据文件在启动时可用
+DATA_FILE_AVAILABLE = init_data()
+
+# 数据库配置 - 使用下载的数据文件
+if DATA_FILE_AVAILABLE:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'data', 'stock_data.db'),
+        }
+    }
+else:
+    # 降级方案：使用默认的 SQLite 数据库
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
+    print("警告: 使用默认数据库，股票数据功能将受限")
