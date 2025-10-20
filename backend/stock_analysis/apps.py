@@ -7,7 +7,7 @@ class StockAnalysisConfig(AppConfig):
 
 #以下是为从github release下载数据库添加代码
 # stock_analysis/apps.py
-from django.apps import AppConfig
+#from django.apps import AppConfig
 
 class StockAnalysisConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
