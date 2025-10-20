@@ -44,6 +44,24 @@ const articlesData = {
             "category": "knowledge-research",
             "description": "深入解析1929年大萧条时期的社会现象：华尔街自杀浪潮与擦鞋童指标，探讨金融崩溃对社会心理的深远影响",
             "keywords": ["大萧条","1929年股灾","华尔街窗口","擦鞋童指标","约瑟夫·P·肯尼迪","自杀浪潮","黑色星期四","经济危机","股市崩盘","反向指标","金融历史","集体心理"]
+        },
+        {
+            "id": 6,
+            "title": "光大证券"乌龙指"事件：A股三分钟的\"人造牛市\"",
+            "url": "/articles/ew-ssecurities-ultron-finger.html",
+            "date": "2025-10-20",
+            "category": "knowledge-research",
+            "description": "深入解析2013年光大证券乌龙指事件：程序错误引发的三分钟人造牛市，探讨技术故障对金融市场的冲击与警示",
+            "keywords": ["光大证券乌龙指","乌龙指","2013年8月16日","程序错误","人造牛市","内幕交易","股指期货空单","上证指数暴涨","ETF套利","技术故障","中国股市","金融离奇事件","高频交易风险","金融监管"]
+        },
+        {
+            "id": 7,
+            "title": "GameStop轧空大战：散户\"血洗\"华尔街",
+            "url": "/articles/gamestop-short-squeeze.html",
+            "date": "2025-10-20",
+            "category": "knowledge-research",
+            "description": "深入解析2021年GameStop轧空事件：Reddit散户联合对抗华尔街做空机构，探讨社交媒体对金融市场的影响与变革",
+            "keywords": ["GameStop轧空","散户大战华尔街","WallStreetBets","轧空","Melvin Capital","Robinhood","meme股票","2021年GME暴涨","金融起义","散户投资者","对冲基金","做空","期权交易","市场操纵","社交媒体与金融"]
         }
     ]
 };
