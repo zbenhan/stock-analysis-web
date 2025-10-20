@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+import os
+from .data_manager import init_data
 
 # 构建项目根目录路径
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -99,8 +101,7 @@ if not DEBUG:
 # config/settings.py
 
 #以下是为了解决数据库自github release 下载添加的代码
-import os
-from .data_manager import init_data
+
 
 # 项目根目录
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
