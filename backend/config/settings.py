@@ -192,6 +192,9 @@ if DEBUG:
     SECURE_CONTENT_TYPE_NOSNIFF = True
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
+>>>>>>> parent of 9ae12b3 (get database from release)
+=======
 >>>>>>> parent of 9ae12b3 (get database from release)
 =======
 >>>>>>> parent of 9ae12b3 (get database from release)
