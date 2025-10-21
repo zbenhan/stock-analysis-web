@@ -16,6 +16,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 项目根目录（backend的父目录）
+PROJECT_ROOT = BASE_DIR.parent
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
@@ -55,7 +58,10 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'frontend', 'templates'),
+            # 多个可能的模板路径，按优先级排序
+            os.path.join(PROJECT_ROOT, 'frontend', 'templates'),  # 项目根目录下的frontend/templates
+            os.path.join(BASE_DIR, 'templates'),  # backend目录下的templates
+            os.path.join(BASE_DIR, 'frontend', 'templates'),  # backend/frontend/templates
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -115,8 +121,12 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# 多个可能的静态文件路径
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'frontend', 'static'),
+    os.path.join(PROJECT_ROOT, 'frontend', 'static'),  # 项目根目录下的frontend/static
+    os.path.join(BASE_DIR, 'static'),  # backend目录下的static
+    os.path.join(BASE_DIR, 'frontend', 'static'),  # backend/frontend/static
 ]
 
 # 使用 Whitenoise 服务静态文件
@@ -126,9 +136,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# 项目特定设置
-PROJECT_ROOT = BASE_DIR
 
 # 安全设置
 if not DEBUG:
@@ -145,14 +152,18 @@ LOGGING = {
         'console': {
             'class': 'logging.StreamHandler',
         },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(BASE_DIR, 'django.log'),
+        },
     },
     'root': {
-        'handlers': ['console'],
+        'handlers': ['console', 'file'],
         'level': 'INFO',
     },
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['console', 'file'],
             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
             'propagate': False,
         },
@@ -164,3 +175,10 @@ DATA_FILE_URL = os.environ.get(
     'DATA_FILE_URL',
     'https://github.com/zbenhan/stock-analysis-web/releases/download/v1.0.1/stock_data.db'
 )
+
+# 添加模板调试信息
+if DEBUG:
+    TEMPLATES[0]['OPTIONS']['debug'] = True
+    # 在DEBUG模式下显示更详细的错误信息
+    import logging
+    logging.basicConfig(level=logging.DEBUG)
