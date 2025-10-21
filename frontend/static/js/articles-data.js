@@ -47,7 +47,7 @@ const articlesData = {
         },
         {
             "id": 6,
-            "title": "光大证券"乌龙指"事件：A股三分钟的\"人造牛市\"",
+            "title": "光大证券\"乌龙指\"事件：A股三分钟的\"人造牛市\"",
             "url": "/articles/ew-ssecurities-ultron-finger.html",
             "date": "2025-10-20",
             "category": "knowledge-research",
