@@ -190,4 +190,7 @@ if DEBUG:
     CSRF_COOKIE_SECURE = False
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+<<<<<<< HEAD
+>>>>>>> parent of 9ae12b3 (get database from release)
+=======
 >>>>>>> parent of 9ae12b3 (get database from release)
