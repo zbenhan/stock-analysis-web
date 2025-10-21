@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 # stock_analysis/apps.py
 from django.apps import AppConfig
 import os
@@ -12,10 +13,15 @@ from django.apps import AppConfig
 from django.apps import AppConfig
 
 >>>>>>> parent of 9ae12b3 (get database from release)
+=======
+from django.apps import AppConfig
+
+>>>>>>> parent of 9ae12b3 (get database from release)
 
 class StockAnalysisConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'stock_analysis'
+<<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
     
@@ -81,6 +87,8 @@ class StockAnalysisConfig(AppConfig):
             # 创建空的数据库文件作为备用
             open(data_file, 'a').close()
             print("已创建空的数据库文件作为备用")
+=======
+>>>>>>> parent of 9ae12b3 (get database from release)
 =======
 >>>>>>> parent of 9ae12b3 (get database from release)
 =======
